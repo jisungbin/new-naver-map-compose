@@ -15,7 +15,7 @@ compose-runtime = "1.6.3"
 compose-activity = "1.8.2"
 compose-navermap = "3.18.0"
 
-test-kotest = "5.8.0"
+test-kotest = "5.8.1"
 
 [plugins]
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
