@@ -1,5 +1,5 @@
 /*
- * Copyright $YEAR SOUP, Ji Sungbin
+ * Copyright 2024 SOUP, Ji Sungbin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,3 +14,10 @@
  * limitations under the License.
  */
 
+package land.sungbin.navermap.token.overlay
+
+import com.naver.maps.map.overlay.Overlay
+
+public interface OverlayFactory<O : Overlay> {
+  public fun createOverlay(): O
+}

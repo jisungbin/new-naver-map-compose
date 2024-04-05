@@ -1,5 +1,5 @@
 /*
- * Copyright $YEAR SOUP, Ji Sungbin
+ * Copyright 2024 SOUP, Ji Sungbin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,3 +14,10 @@
  * limitations under the License.
  */
 
+package land.sungbin.navermap.compose
+
+import androidx.compose.runtime.ComposableTargetMarker
+
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.TYPE, AnnotationTarget.PROPERTY_GETTER)
+@ComposableTargetMarker(description = "NaverMap Composable")
+public annotation class NaverMapComposable

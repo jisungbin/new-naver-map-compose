@@ -1,5 +1,5 @@
 /*
- * Copyright $YEAR SOUP, Ji Sungbin
+ * Copyright 2024 SOUP, Ji Sungbin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,3 +14,16 @@
  * limitations under the License.
  */
 
+package land.sungbin.navermap.compose.runtime
+
+import com.naver.maps.map.NaverMap
+import land.sungbin.navermap.compose.lifecycle.NaverMapContentLifecycleCallback
+
+internal interface MapOwner {
+  var map: NaverMap?
+  var callback: NaverMapContentLifecycleCallback
+}
+
+@PublishedApi
+internal fun MapOwner.requireMap(): NaverMap =
+  checkNotNull(map) { "This node($this) does not have an Map." }

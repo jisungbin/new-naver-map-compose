@@ -1,5 +1,5 @@
 /*
- * Copyright $YEAR SOUP, Ji Sungbin
+ * Copyright 2024 SOUP, Ji Sungbin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,3 +14,14 @@
  * limitations under the License.
  */
 
+package land.sungbin.navermap.token
+
+import androidx.annotation.Px
+
+public interface HasSize {
+  @get:Px
+  public var width: Int?
+
+  @get:Px
+  public var height: Int?
+}
