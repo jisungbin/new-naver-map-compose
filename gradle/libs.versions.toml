@@ -1,6 +1,6 @@
 [versions]
 gradle-android = "8.2.2"
-gradle-publish-maven = "0.27.0"
+gradle-publish-maven = "0.28.0"
 
 spotless = "6.25.0"
 ktlint = "1.1.1"
