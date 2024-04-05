@@ -11,7 +11,7 @@ kotlin-dokka = "1.9.20"
 androidx-activity = "1.8.2"
 
 compose-compiler = "1.5.10"
-compose-runtime = "1.6.3"
+compose-runtime = "1.6.5"
 compose-activity = "1.8.2"
 compose-navermap = "3.18.0"
 
