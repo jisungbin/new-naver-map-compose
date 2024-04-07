@@ -50,4 +50,7 @@ dependencies {
   implementation(libs.jetbrains.annotations)
   api(libs.navermap)
   api(projects.navermapToken)
+
+  testImplementation(kotlin("test"))
+  testImplementation(libs.test.assertk)
 }
