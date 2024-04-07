@@ -148,7 +148,7 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
     }
 
     supportKindSet.fastForEach { kind ->
-      if (this.contributorMap!![kind.mask]!!.isEmpty()) {
+      if (this.contributorMap!![kind.mask]?.isEmpty() == true) {
         this.contributorMap!!.remove(kind.mask)
         this.contributionNodeMap!!.remove(kind.mask)
       }

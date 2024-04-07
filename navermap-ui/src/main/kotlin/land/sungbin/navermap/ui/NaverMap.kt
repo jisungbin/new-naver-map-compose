@@ -19,6 +19,7 @@ package land.sungbin.navermap.ui
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -102,11 +103,16 @@ public fun NaverMap(
       val composition = Composition(MapApplier(layoutNode), parent = parentComposition)
       composition.apply {
         setContent {
-          CompositionLocalProvider(compositionLocalContext, content = currentContent)
+          CompositionLocalProvider(compositionLocalContext) {
+            ComposeNode<LayoutNode, MapApplier>(
+              factory = { layoutNode },
+              update = {},
+            )
+            currentContent()
+          }
         }
       }
     }
-
     map.value = null
   }
 }
