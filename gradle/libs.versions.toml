@@ -1,23 +1,23 @@
 [versions]
 gradle-android = "8.2.2"
-gradle-publish-maven = "0.27.0"
+gradle-publish-maven = "0.28.0"
 
 spotless = "6.25.0"
-ktlint = "1.1.1"
+ktlint = "1.2.1"
 
-kotlin-core = "1.9.22"
+kotlin-core = "1.9.23"
 kotlin-dokka = "1.9.20"
 
 androidx-activity = "1.8.2"
 
-compose-compiler = "1.5.10"
-compose-runtime = "1.6.3"
+compose-compiler = "1.5.11"
+compose-runtime = "1.6.5"
 compose-activity = "1.8.2"
 compose-navermap = "3.18.0"
 
 jetbrains-annotations = "24.1.0"
 
-test-kotest = "5.8.0"
+test-assertk = "0.28.0"
 
 [plugins]
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
@@ -45,6 +45,6 @@ compose-activity = { module = "androidx.activity:activity-compose", version.ref 
 navermap = { module = "com.naver.maps:map-sdk", version.ref = "compose-navermap" }
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 
-test-kotest-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "test-kotest" }
+test-assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "test-assertk" }
 
 ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" } # for Renovate
