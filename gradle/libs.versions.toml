@@ -15,6 +15,8 @@ compose-runtime = "1.6.3"
 compose-activity = "1.8.2"
 compose-navermap = "3.18.0"
 
+jetbrains-annotations = "24.1.0"
+
 test-kotest = "5.8.0"
 
 [plugins]
@@ -35,11 +37,13 @@ androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "
 compose-compiler = { module = "androidx.compose.compiler:compiler-hosted", version.ref = "compose-compiler" }  # for Renovate
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-runtime" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose-runtime" }
+compose-uiutil = { module = "androidx.compose.ui:ui-util", version.ref = "compose-runtime" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose-runtime" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose-runtime" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 
 navermap = { module = "com.naver.maps:map-sdk", version.ref = "compose-navermap" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 
 test-kotest-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "test-kotest" }
 

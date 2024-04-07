@@ -13,41 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:Suppress("UnstableApiUsage")
+
 plugins {
-  id("com.android.application")
+  id("com.android.library")
   kotlin("android")
+  id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
 android {
-  namespace = "land.sungbin.navermap.sample"
+  namespace = "land.sungbin.navermap.compose"
   compileSdk = 34
 
   defaultConfig {
-    minSdk = 24
+    minSdk = 21
+  }
+
+  sourceSets {
+    getByName("main").java.srcDir("src/main/kotlin")
+    getByName("test").java.srcDir("src/main/kotlin")
   }
 
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
   }
+}
 
-  sourceSets {
-    getByName("main").java.srcDir("src/main/kotlin")
-  }
-
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-  }
+kotlin {
+  explicitApi()
 }
 
 dependencies {
-  implementation(libs.compose.activity)
-  implementation(libs.compose.material)
-  implementation(libs.androidx.activity)
-
-  implementation(projects.navermapUi)
+  implementation(libs.compose.runtime)
+  implementation(libs.compose.uiutil)
+  implementation(libs.jetbrains.annotations)
+  api(libs.navermap)
+  api(projects.navermapToken)
 }

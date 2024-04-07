@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.sample
+package land.sungbin.navermap.token
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-import land.sungbin.navermap.ui.NaverMap
+import com.naver.maps.map.overlay.Overlay
+import org.jetbrains.annotations.Contract
 
-class SampleActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent {
-      NaverMap(modifier = Modifier.fillMaxSize())
-    }
-  }
+public abstract class OverlayFactory<O : Overlay> {
+  @Contract(pure = true)
+  public abstract fun createOverlay(): O
 }

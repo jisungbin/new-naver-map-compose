@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.sample
+package land.sungbin.navermap.runtime.node
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-import land.sungbin.navermap.ui.NaverMap
+public class Symbol<T> internal constructor() {
+  private var value: T? = null
+  public val owner: T get() = value ?: error("Symbol is not bound")
 
-class SampleActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent {
-      NaverMap(modifier = Modifier.fillMaxSize())
-    }
+  internal fun unbound() {
+    value = null
   }
+
+  internal fun bound(value: T) {
+    if (this.value != null) error("Symbol is already bound")
+    this.value = value
+  }
+
+  internal fun isBound(): Boolean = value != null
 }

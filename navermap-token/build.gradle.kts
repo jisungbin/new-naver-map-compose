@@ -45,7 +45,6 @@ kotlin {
 }
 
 dependencies {
-  implementation(libs.compose.runtime)
-  implementation(libs.compose.ui)
   implementation(libs.navermap)
+  implementation(libs.jetbrains.annotations)
 }

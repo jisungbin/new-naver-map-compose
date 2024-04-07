@@ -99,6 +99,7 @@ subprojects {
       freeCompilerArgs = freeCompilerArgs + listOf(
         "-opt-in=kotlin.OptIn",
         "-opt-in=kotlin.RequiresOptIn",
+        "-opt-in=kotlin.contracts.ExperimentalContracts",
       )
 
       // https://github.com/ZacSweers/redacted-compiler-plugin/blob/c866a8ae7b2ab039fee9709c990a5478ac0dc0c7/redacted-compiler-plugin-gradle/build.gradle.kts#L91-L94

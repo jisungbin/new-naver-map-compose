@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.sample
+package land.sungbin.navermap.runtime.modifier
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-import land.sungbin.navermap.ui.NaverMap
+import androidx.compose.runtime.Stable
+import land.sungbin.navermap.runtime.contributor.ContributionKind
+import land.sungbin.navermap.runtime.contributor.Contributor
 
-class SampleActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent {
-      NaverMap(modifier = Modifier.fillMaxSize())
-    }
-  }
+@Stable
+public interface MapModifierContributionNode : MapModifierNode<Contributor> {
+  public val kindSet: ContributionKind
+  public fun create(): Contributor
+  public fun update(contributor: Contributor)
 }

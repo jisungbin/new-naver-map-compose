@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.sample
+package land.sungbin.navermap.runtime.contributor
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-import land.sungbin.navermap.ui.NaverMap
+import com.naver.maps.map.overlay.Overlay
 
-class SampleActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContent {
-      NaverMap(modifier = Modifier.fillMaxSize())
-    }
-  }
+public interface OverlayContributor<O : Overlay> : Contributor {
+  /** 만약 null이 아닌 값이 반환되면 해당 값을 노드 생성 대신 사용합니다. */
+  public val delegateOverlay: O? get() = null
+
+  /** 주어진 타입의 노드가 생성됐을 때 [O]와 함께 호출됩니다. */
+  public fun O.contribute()
 }

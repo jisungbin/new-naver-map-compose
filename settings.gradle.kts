@@ -26,6 +26,7 @@ buildCache {
 
 include(
   ":sample",
-  ":navermap-compose",
+  ":navermap-ui",
+  ":navermap-runtime",
   ":navermap-token",
 )
