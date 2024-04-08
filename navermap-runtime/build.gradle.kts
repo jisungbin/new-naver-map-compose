@@ -39,6 +39,14 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
 
+  kotlinOptions {
+    compileOptions {
+      freeCompilerArgs = freeCompilerArgs + listOf(
+        "-opt-in=land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi",
+      )
+    }
+  }
+
   testOptions.unitTests {
     all { test ->
       test.useJUnitPlatform()

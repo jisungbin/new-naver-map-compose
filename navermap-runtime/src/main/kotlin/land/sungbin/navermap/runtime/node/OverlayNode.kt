@@ -29,7 +29,6 @@ public class OverlayNode<O : Overlay>(
   private var lifecycle: MapNodeLifecycleCallback = EmptyMapNodeLifecycleCallback,
 ) : MapNode<O>() {
   private val nodes = MapModifierNodeChain(supportKindSet = listOf(Contributors.Overlay))
-  public override var symbol: Symbol<O> = Symbol()
 
   internal var isAttached: Boolean = false
     private set
@@ -53,7 +52,7 @@ public class OverlayNode<O : Overlay>(
     @Suppress("UNCHECKED_CAST")
     if (delegateIfExist != null) symbol.bound(delegateIfExist as O) else symbol.bound(factory!!.createOverlay())
     factory = null
-    symbol.owner.map = layoutNode().host()
+    symbol.owner.map = layoutNode().naverMap()
     lifecycle.onAttached()
     nodes.contributes(symbol.owner, Contributors.Overlay)
     isAttached = true

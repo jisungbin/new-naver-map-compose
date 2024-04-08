@@ -28,8 +28,6 @@ public class LayoutNode(
   private var lifecycle: MapNodeLifecycleCallback = EmptyMapNodeLifecycleCallback,
 ) : MapNode<MapView>() {
   private val nodes = MapModifierNodeChain(supportKindSet = listOf(Contributors.MapView, Contributors.NaverMap))
-
-  override var symbol: Symbol<MapView> = Symbol()
   internal val mapSymbol: Symbol<NaverMap> = Symbol()
 
   init {
@@ -52,7 +50,7 @@ public class LayoutNode(
     factory = null
     lifecycle.onAttached()
     nodes.contributes(symbol.owner, Contributors.NaverMap)
-    symbol.owner.followMapHost()
+    symbol.owner.followNaverMap()
   }
 
   override fun detach() {
@@ -63,7 +61,7 @@ public class LayoutNode(
     lifecycle = EmptyMapNodeLifecycleCallback
   }
 
-  private fun MapView.followMapHost() = getMapAsync { host ->
+  private fun MapView.followNaverMap() = getMapAsync { host ->
     mapSymbol.bound(host)
     nodes.contributes(host, Contributors.NaverMap)
     this@LayoutNode.children.forEach { node ->
@@ -73,7 +71,7 @@ public class LayoutNode(
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun LayoutNode.map(): MapView = symbol.owner
+public inline fun LayoutNode.mapView(): MapView = symbol.owner
 
 @Suppress("NOTHING_TO_INLINE")
-internal inline fun LayoutNode.host(): NaverMap = mapSymbol.owner
+internal inline fun LayoutNode.naverMap(): NaverMap = mapSymbol.owner

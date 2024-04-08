@@ -19,18 +19,17 @@ package land.sungbin.navermap.ui
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.currentRecomposeScope
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.Ref
@@ -40,7 +39,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMapOptions
-import kotlinx.coroutines.awaitCancellation
+import land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi
 import land.sungbin.navermap.runtime.MapApplier
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -57,10 +56,11 @@ private val NoContent: @[Composable NaverMapComposable] () -> Unit = {}
 @Composable
 public fun NaverMap(
   modifier: Modifier = Modifier,
-  mapModifier: MapModifier = MapModifier,
-  content: @[Composable NaverMapComposable] () -> Unit = NoContent,
+  mapContentModifier: MapModifier = MapModifier,
+  mapContent: @[Composable NaverMapComposable] () -> Unit = NoContent,
 ) {
   val context = LocalContext.current
+  val parentComposer = currentComposer
   val parentRecomposeScope = currentRecomposeScope
 
   val map = remember { Ref<MapView>() }
@@ -68,16 +68,14 @@ public fun NaverMap(
     AndroidView(modifier = modifier, factory = { map.value!! })
   }
 
-  val currentContent by rememberUpdatedState(content)
-
-  val parentComposition = rememberCompositionContext()
+  val parentCompositionContext = rememberCompositionContext()
   val compositionLocalContext = currentCompositionLocalContext
 
   val lifecycle = LocalLifecycleOwner.current.lifecycle
   val previousState = remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
   val savedInstanceState = rememberSaveable { Bundle() }
 
-  val layoutModifier = remember {
+  val mapLayoutModifier = remember {
     MapModifier
       .then(
         MapViewInstanceInterceptorNode { instance ->
@@ -87,33 +85,29 @@ public fun NaverMap(
       )
       .mapLifecycle(context, lifecycle, previousState, savedInstanceState)
   }
-  val layoutNode = remember {
+  val mapLayoutNode = remember {
     LayoutNode(
-      modifier = layoutModifier then mapModifier,
+      modifier = mapLayoutModifier then mapContentModifier,
       factory = { unwrapAppCompat(MapView(context, NaverMapOptions())) },
     )
   }
 
-  LaunchedEffect(mapModifier) {
-    layoutNode.modifier = layoutModifier then mapModifier
+  val mapComposition = remember { Composition(MapApplier(mapLayoutNode), parent = parentCompositionContext) }
+
+  LaunchedEffect(mapComposition) {
+    @OptIn(InternalComposeApi::class, InternalNaverMapRuntimeApi::class)
+    mapLayoutNode.onCompositionReleaseRequest = {
+      parentComposer.recordSideEffect(mapComposition::dispose)
+      map.value = null
+    }
   }
 
-  LaunchedEffect(map) {
-    disposingComposition {
-      val composition = Composition(MapApplier(layoutNode), parent = parentComposition)
-      composition.apply {
-        setContent {
-          CompositionLocalProvider(compositionLocalContext) {
-            ComposeNode<LayoutNode, MapApplier>(
-              factory = { layoutNode },
-              update = {},
-            )
-            currentContent()
-          }
-        }
-      }
-    }
-    map.value = null
+  LaunchedEffect(mapContentModifier) {
+    mapLayoutNode.modifier = mapLayoutModifier then mapContentModifier
+  }
+
+  mapComposition.setContent {
+    CompositionLocalProvider(compositionLocalContext, content = mapContent)
   }
 }
 
@@ -138,15 +132,6 @@ private class MapViewInstanceInterceptorNode(
 
   override fun equals(other: Any?): Boolean = true
   override fun hashCode(): Int = 0
-}
-
-private suspend inline fun disposingComposition(factory: () -> Composition) {
-  val composition = factory()
-  try {
-    awaitCancellation()
-  } finally {
-    composition.dispose()
-  }
 }
 
 private fun unwrapAppCompat(map: MapView) = map.apply {

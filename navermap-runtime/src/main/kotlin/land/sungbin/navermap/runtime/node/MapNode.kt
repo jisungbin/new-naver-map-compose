@@ -16,15 +16,27 @@
 
 package land.sungbin.navermap.runtime.node
 
+import androidx.annotation.CallSuper
+import androidx.compose.runtime.ComposeNodeLifecycleCallback
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
+import land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi
+import org.jetbrains.annotations.ApiStatus.OverrideOnly
 
-public abstract class MapNode<Owner> {
-  public abstract var symbol: Symbol<Owner>
-
+public abstract class MapNode<Owner>(
+  @InternalNaverMapRuntimeApi // Called when the node is removed from the composition
+  public var onCompositionReleaseRequest: (() -> Unit)? = null,
+) : ComposeNodeLifecycleCallback {
   protected val children: MutableVector<MapNode<*>> = mutableVectorOf()
 
+  @InternalNaverMapRuntimeApi
+  public val symbol: Symbol<Owner> = Symbol()
+
   public abstract fun attach()
+
+  // OverrideOnly: Auto call when the node is removed from the composition
+  @OverrideOnly
+  @InternalNaverMapRuntimeApi
   public abstract fun detach()
 
   public fun insertAt(index: Int, instance: MapNode<*>) {
@@ -34,8 +46,7 @@ public abstract class MapNode<Owner> {
   public fun removeAt(index: Int, count: Int) {
     require(count >= 0) { "count ($count) must be greater than 0" }
     for (i in index + count - 1 downTo index) {
-      val child = children.removeAt(i)
-      child.detach()
+      children.removeAt(i)
     }
   }
 
@@ -52,8 +63,25 @@ public abstract class MapNode<Owner> {
 
   public fun removeAll() {
     for (i in children.size - 1 downTo 0) {
-      val child = children.removeAt(i)
-      child.detach()
+      children.removeAt(i)
+    }
+  }
+
+  override fun onReuse() {
+    // Nothing to do
+  }
+
+  override fun onDeactivate() {
+    // Nothing to do
+  }
+
+  @CallSuper
+  override fun onRelease() {
+    children.forEach(MapNode<*>::detach)
+    val onCompositionReleaseRequest = onCompositionReleaseRequest
+    if (onCompositionReleaseRequest != null) {
+      onCompositionReleaseRequest.invoke()
+      this.onCompositionReleaseRequest = null
     }
   }
 }
