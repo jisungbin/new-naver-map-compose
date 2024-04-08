@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.runtime.contributor
+package land.sungbin.navermap.runtime.delegate
 
-import land.sungbin.navermap.runtime.delegate.MapViewDelegator
-import land.sungbin.navermap.runtime.node.DelegatedMapView
+import land.sungbin.navermap.runtime.node.DelegatedNaverMap
 
-public interface MapViewContributor : Contributor {
-  public val mapViewInstance: MapViewDelegator? get() = null
-  public fun DelegatedMapView.contribute()
+public interface NaverMapDelegator : Delegator {
+  override val instance: DelegatedNaverMap
+
+  public companion object {
+    @Suppress("NOTHING_TO_INLINE")
+    public inline operator fun invoke(map: DelegatedNaverMap): NaverMapDelegator =
+      object : NaverMapDelegator {
+        override val instance: DelegatedNaverMap = map
+      }
+  }
 }

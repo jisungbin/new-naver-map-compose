@@ -16,9 +16,10 @@
 
 package land.sungbin.navermap.runtime.contributor
 
-import com.naver.maps.map.overlay.Overlay
+import land.sungbin.navermap.runtime.delegate.OverlayDelegator
+import land.sungbin.navermap.runtime.node.DelegatedOverlay
 
-public interface OverlayContributor<O : Overlay> : Contributor {
-  public val delegateOverlay: O? get() = null
-  public fun O.contribute()
+public interface OverlayContributor : Contributor {
+  public val overlayInstance: OverlayDelegator? get() = null
+  public fun DelegatedOverlay.contribute()
 }

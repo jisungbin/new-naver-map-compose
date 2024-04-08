@@ -22,8 +22,6 @@ import androidx.collection.mutableIntObjectMapOf
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.util.fastForEach
-import com.naver.maps.map.MapView
-import com.naver.maps.map.NaverMap
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors
@@ -31,6 +29,10 @@ import land.sungbin.navermap.runtime.contributor.MapViewContributor
 import land.sungbin.navermap.runtime.contributor.NaverMapContributor
 import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.contributor.contains
+import land.sungbin.navermap.runtime.delegate.Delegator
+import land.sungbin.navermap.runtime.delegate.MapViewDelegator
+import land.sungbin.navermap.runtime.delegate.NaverMapDelegator
+import land.sungbin.navermap.runtime.delegate.OverlayDelegator
 import org.jetbrains.annotations.TestOnly
 
 private typealias ContributorMap = MutableIntObjectMap<MutableVector<Contributor>>
@@ -85,26 +87,26 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
     }
   }
 
-  inline fun <reified Owner> delegatorOrNull(kind: ContributionKind): Owner? {
+  inline fun <reified D : Delegator> delegatorOrNull(kind: ContributionKind): D? {
     val contributors = contributorMap ?: return null
-    return contributors[kind.mask]?.fold<Owner?>(null) { acc, contributor ->
-      val delegate: Owner? = when (kind) {
-        Contributors.NaverMap -> (contributor as NaverMapContributor).delegateNaverMap as Owner?
-        Contributors.MapView -> (contributor as MapViewContributor).delegateMapView as Owner?
-        Contributors.Overlay -> (contributor as OverlayContributor<*>).delegateOverlay as Owner?
+    return contributors[kind.mask]?.fold<D?>(null) { acc, contributor ->
+      val delegate: D? = when (kind) {
+        Contributors.NaverMap -> (contributor as NaverMapContributor).naverMapInstance as D?
+        Contributors.MapView -> (contributor as MapViewContributor).mapViewInstance as D?
+        Contributors.Overlay -> (contributor as OverlayContributor).overlayInstance as D?
         else -> null
       }
-      if (delegate is Owner) {
-        if (acc != null) throw IllegalStateException("[$kind] delegate was provided multiple times.")
+      if (delegate is D) {
+        if (acc != null) error("[$kind] delegate was provided multiple times.")
         delegate
       } else acc
     }
   }
 
   /* prepareContributorsFrom -> trimContributors -> (lazy) contributes */
-  fun <Owner> contributes(owner: Owner, kind: ContributionKind) {
+  fun contributes(delegator: Delegator, kind: ContributionKind) {
     val contributors = contributorMap ?: return
-    contributors[kind.mask]?.forEach { contributor -> contributor.execute(owner, kind) }
+    contributors[kind.mask]?.forEach { contributor -> contributor.execute(delegator, kind) }
   }
 
   fun trimContributors() {
@@ -266,12 +268,11 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
     }
   }
 
-  @Suppress("UNCHECKED_CAST", "UPPER_BOUND_VIOLATED")
-  private fun <Owner> Contributor.execute(owner: Owner, kind: ContributionKind) {
+  private fun Contributor.execute(delegator: Delegator, kind: ContributionKind) {
     when (kind) {
-      Contributors.NaverMap -> with(this as NaverMapContributor) { (owner as NaverMap).contribute() }
-      Contributors.MapView -> with(this as MapViewContributor) { (owner as MapView).contribute() }
-      Contributors.Overlay -> with(this as OverlayContributor<Owner>) { owner.contribute() }
+      Contributors.NaverMap -> with(this as NaverMapContributor) { (delegator as NaverMapDelegator).instance.contribute() }
+      Contributors.MapView -> with(this as MapViewContributor) { (delegator as MapViewDelegator).instance.contribute() }
+      Contributors.Overlay -> with(this as OverlayContributor) { (delegator as OverlayDelegator).instance.contribute() }
       else -> error("Invalid kind: $kind")
     }
   }
@@ -283,8 +284,12 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
     validate()
   }
 
-  private fun FlaggedContributionNode.markDirty(level: DirtyLevel, dirtyNode: ContributionNode, cleanNode: ContributionNode) {
-    check(level != ActionRemove) { "For dirty flagging with ActionRemove, use markRemoving." }
+  private fun FlaggedContributionNode.markDirty(
+    level: DirtyLevel,
+    dirtyNode: ContributionNode,
+    cleanNode: ContributionNode,
+  ) {
+    require(level != ActionRemove) { "For dirty flagging with ActionRemove, use markRemoving." }
     dirtyLevel = level
     this.dirtyNode = dirtyNode
     this.cleanNode = cleanNode

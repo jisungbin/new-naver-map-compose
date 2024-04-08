@@ -16,18 +16,19 @@
 
 package land.sungbin.navermap.runtime.node
 
-import com.naver.maps.map.overlay.Overlay
 import land.sungbin.navermap.runtime.contributor.Contributors
+import land.sungbin.navermap.runtime.delegate.OverlayDelegator
 import land.sungbin.navermap.runtime.modifier.MapModifier
 import land.sungbin.navermap.runtime.modifier.MapModifierNodeChain
-import land.sungbin.navermap.token.OverlayFactory
 
-public class OverlayNode<O : Overlay>(
+public typealias DelegatedOverlay = Any
+
+public class OverlayNode(
   modifier: MapModifier,
-  private var factory: OverlayFactory<O>?,
-  private var layoutNode: LayoutNode? = null,
+  private var factory: (() -> OverlayDelegator)?,
+  internal var layoutNode: LayoutNode? = null,
   private var lifecycle: MapNodeLifecycleCallback = EmptyMapNodeLifecycleCallback,
-) : MapNode<O>() {
+) : MapNode<OverlayDelegator>() {
   private val nodes = MapModifierNodeChain(supportKindSet = listOf(Contributors.Overlay))
 
   internal var isAttached: Boolean = false
@@ -43,25 +44,24 @@ public class OverlayNode<O : Overlay>(
     set(value) {
       nodes.prepareContributorsFrom(value)
       nodes.trimContributors()
-      if (symbol.isBound()) nodes.contributes(symbol.owner, Contributors.Overlay)
+      if (delegator.isBound()) nodes.contributes(delegator.owner, Contributors.Overlay)
       field = value
     }
 
   override fun attach() {
-    val delegateIfExist = nodes.delegatorOrNull<Overlay>(Contributors.Overlay)
-    @Suppress("UNCHECKED_CAST")
-    if (delegateIfExist != null) symbol.bound(delegateIfExist as O) else symbol.bound(factory!!.createOverlay())
+    val delegateIfExist = nodes.delegatorOrNull<OverlayDelegator>(Contributors.Overlay)
+    delegator.bound(delegateIfExist ?: factory!!())
     factory = null
-    symbol.owner.map = layoutNode().naverMap()
+    delegator.owner.setMap(layoutNode().naverMap())
     lifecycle.onAttached()
-    nodes.contributes(symbol.owner, Contributors.Overlay)
+    nodes.contributes(delegator.owner, Contributors.Overlay)
     isAttached = true
   }
 
   override fun detach() {
-    symbol.unbound()
+    delegator.owner.setMap(null)
+    delegator.unbound()
     modifier = MapModifier // Remove all contributors
-    symbol.owner.map = null
     lifecycle.onDetached()
     lifecycle = EmptyMapNodeLifecycleCallback
     layoutNode = null
@@ -72,4 +72,4 @@ public class OverlayNode<O : Overlay>(
 }
 
 @Suppress("NOTHING_TO_INLINE")
-public inline fun <O : Overlay> OverlayNode<O>.overlay(): O = symbol.owner
+public inline fun OverlayNode.overlay(): OverlayDelegator = delegator.owner

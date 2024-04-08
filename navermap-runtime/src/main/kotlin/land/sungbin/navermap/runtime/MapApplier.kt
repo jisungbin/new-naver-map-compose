@@ -20,6 +20,7 @@ import androidx.compose.runtime.Applier
 import androidx.compose.ui.util.fastForEach
 import land.sungbin.navermap.runtime.node.LayoutNode
 import land.sungbin.navermap.runtime.node.MapNode
+import land.sungbin.navermap.runtime.node.OverlayNode
 
 public class MapApplier(private val root: LayoutNode) : Applier<MapNode<*>> {
   private val stack = mutableListOf<MapNode<*>>()
@@ -31,6 +32,7 @@ public class MapApplier(private val root: LayoutNode) : Applier<MapNode<*>> {
   }
 
   override fun down(node: MapNode<*>) {
+    if (node is OverlayNode) node.layoutNode = root
     stack.add(current)
     current = node
   }
@@ -46,6 +48,7 @@ public class MapApplier(private val root: LayoutNode) : Applier<MapNode<*>> {
   }
 
   override fun insertBottomUp(index: Int, instance: MapNode<*>) {
+    if (instance is OverlayNode) instance.layoutNode = root
     current.insertAt(index, instance)
   }
 

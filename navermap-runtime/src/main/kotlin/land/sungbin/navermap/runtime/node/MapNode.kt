@@ -21,16 +21,17 @@ import androidx.compose.runtime.ComposeNodeLifecycleCallback
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi
+import land.sungbin.navermap.runtime.delegate.Delegator
 import org.jetbrains.annotations.ApiStatus.OverrideOnly
 
-public abstract class MapNode<Owner>(
+public abstract class MapNode<D : Delegator>(
   @InternalNaverMapRuntimeApi // Called when the node is removed from the composition
   public var onCompositionReleaseRequest: (() -> Unit)? = null,
 ) : ComposeNodeLifecycleCallback {
   protected val children: MutableVector<MapNode<*>> = mutableVectorOf()
 
   @InternalNaverMapRuntimeApi
-  public val symbol: Symbol<Owner> = Symbol()
+  public val delegator: Symbol<D> = Symbol()
 
   public abstract fun attach()
 
@@ -79,6 +80,7 @@ public abstract class MapNode<Owner>(
   override fun onRelease() {
     children.forEach(MapNode<*>::detach)
     val onCompositionReleaseRequest = onCompositionReleaseRequest
+    // Only root node has onCompositionReleaseRequest callback
     if (onCompositionReleaseRequest != null) {
       onCompositionReleaseRequest.invoke()
       this.onCompositionReleaseRequest = null

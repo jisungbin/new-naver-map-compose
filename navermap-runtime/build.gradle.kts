@@ -61,9 +61,9 @@ kotlin {
 dependencies {
   implementation(libs.compose.runtime)
   implementation(libs.compose.uiutil)
-  implementation(libs.jetbrains.annotations)
-  api(libs.navermap)
-  api(projects.navermapToken)
+  implementation(libs.androidx.annotation)
+  implementation(libs.androidx.collection)
+  implementation(libs.jetbrains.annotation)
 
   testImplementation(kotlin("test"))
   testImplementation(libs.test.assertk)

@@ -16,9 +16,10 @@
 
 package land.sungbin.navermap.runtime.contributor
 
-import com.naver.maps.map.NaverMap
+import land.sungbin.navermap.runtime.delegate.NaverMapDelegator
+import land.sungbin.navermap.runtime.node.DelegatedNaverMap
 
 public interface NaverMapContributor : Contributor {
-  public val delegateNaverMap: NaverMap? get() = null
-  public fun NaverMap.contribute()
+  public val naverMapInstance: NaverMapDelegator? get() = null
+  public fun DelegatedNaverMap.contribute()
 }
