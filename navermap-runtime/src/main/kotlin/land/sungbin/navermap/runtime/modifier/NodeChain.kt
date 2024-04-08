@@ -16,6 +16,7 @@
 
 package land.sungbin.navermap.runtime.modifier
 
+import androidx.annotation.VisibleForTesting
 import androidx.collection.MutableIntObjectMap
 import androidx.collection.mutableIntObjectMapOf
 import androidx.compose.runtime.collection.MutableVector
@@ -30,6 +31,7 @@ import land.sungbin.navermap.runtime.contributor.MapViewContributor
 import land.sungbin.navermap.runtime.contributor.NaverMapContributor
 import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.contributor.contains
+import org.jetbrains.annotations.TestOnly
 
 private typealias ContributorMap = MutableIntObjectMap<MutableVector<Contributor>>
 
@@ -38,7 +40,8 @@ private typealias ContributionNodeDirtyMap = MutableIntObjectMap<MutableVector<F
 
 private typealias DirtyLevel = Int
 
-private class FlaggedContributionNode(
+@VisibleForTesting
+internal class FlaggedContributionNode(
   var cleanNode: ContributionNode? = null,
   var dirtyLevel: DirtyLevel? = null,
   var dirtyNode: ContributionNode? = null,
@@ -64,6 +67,23 @@ private class FlaggedContributionNode(
 internal class MapModifierNodeChain(private val supportKindSet: List<ContributionKind>) {
   private var contributorMap: ContributorMap? = null
   private var contributionNodeMap: ContributionNodeDirtyMap? = null
+
+  @TestOnly
+  private fun <T> MutableVector<T>.getAsList(): List<T> = asMutableList()
+
+  @TestOnly
+  internal fun testGetContributorMap() = buildMap {
+    contributorMap?.forEach { key, value ->
+      put(key, value.getAsList())
+    }
+  }
+
+  @TestOnly
+  internal fun testGetContributionNodeMap() = buildMap {
+    contributionNodeMap?.forEach { key, value ->
+      put(key, value.getAsList())
+    }
+  }
 
   inline fun <reified Owner> delegatorOrNull(kind: ContributionKind): Owner? {
     val contributors = contributorMap ?: return null
@@ -296,10 +316,17 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
   }
 }
 
-private const val ActionReuse: DirtyLevel = 0
-private const val ActionUpdate: DirtyLevel = 1
-private const val ActionReplace: DirtyLevel = 2
-private const val ActionRemove: DirtyLevel = 3
+@VisibleForTesting
+internal const val ActionReuse: DirtyLevel = 0
+
+@VisibleForTesting
+internal const val ActionUpdate: DirtyLevel = 1
+
+@VisibleForTesting
+internal const val ActionReplace: DirtyLevel = 2
+
+@VisibleForTesting
+internal const val ActionRemove: DirtyLevel = 3
 
 /**
  * Here's the rules for reusing nodes for different modifiers:
@@ -307,7 +334,8 @@ private const val ActionRemove: DirtyLevel = 3
  * 2. if modifiers are same class, we REUSE and UPDATE
  * 3. else REPLACE (NO REUSE, NO UPDATE)
  */
-private fun dirtyForModifiers(prev: MapModifierNode<*>, next: MapModifierNode<*>) =
+@VisibleForTesting
+internal fun dirtyForModifiers(prev: MapModifierNode<*>, next: MapModifierNode<*>) =
   if (prev == next) {
     ActionReuse
   } else if (prev::class.java === next::class.java) {
