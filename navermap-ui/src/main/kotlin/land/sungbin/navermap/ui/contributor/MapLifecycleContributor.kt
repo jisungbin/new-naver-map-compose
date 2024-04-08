@@ -31,6 +31,7 @@ import land.sungbin.navermap.runtime.contributor.Contributors
 import land.sungbin.navermap.runtime.contributor.MapViewContributor
 import land.sungbin.navermap.runtime.modifier.MapModifier
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
+import land.sungbin.navermap.runtime.node.DelegatedMapView
 
 @Stable
 public fun MapModifier.mapLifecycle(
@@ -85,7 +86,12 @@ private class MapLifecycleContributor(
 ) : MapViewContributor {
   var mapViewClear: (() -> Unit)? = null
 
-  override fun MapView.contribute() {
+  override fun DelegatedMapView.contribute() {
+    (this as MapView).contribute()
+  }
+
+  @Suppress("NOTHING_TO_INLINE")
+  private inline fun MapView.contribute() {
     val mapLifecycleObserver = lifecycleObserver(
       savedInstanceState = savedInstanceState.takeUnless(Bundle::isEmpty),
       previousState = previousState,

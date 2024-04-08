@@ -41,23 +41,25 @@ import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMapOptions
 import land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi
 import land.sungbin.navermap.runtime.MapApplier
-import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors
 import land.sungbin.navermap.runtime.contributor.MapViewContributor
+import land.sungbin.navermap.runtime.delegate.MapViewDelegator
+import land.sungbin.navermap.runtime.delegate.NaverMapDelegator
 import land.sungbin.navermap.runtime.modifier.MapModifier
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
+import land.sungbin.navermap.runtime.node.DelegatedMapView
 import land.sungbin.navermap.runtime.node.LayoutNode
 import land.sungbin.navermap.ui.contributor.mapLifecycle
 import com.naver.maps.map.R as NaverMapR
 
-private val NoContent: @[Composable NaverMapComposable] () -> Unit = {}
+private val NoContent: NaverMapContentScope.() -> Unit = {}
 
 @Composable
 public fun NaverMap(
   modifier: Modifier = Modifier,
   mapContentModifier: MapModifier = MapModifier,
-  mapContent: @[Composable NaverMapComposable] () -> Unit = NoContent,
+  mapContent: NaverMapContentScope.() -> Unit = NoContent,
 ) {
   val context = LocalContext.current
   val parentComposer = currentComposer
@@ -75,7 +77,7 @@ public fun NaverMap(
   val previousState = remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
   val savedInstanceState = rememberSaveable { Bundle() }
 
-  val mapLayoutModifier = remember {
+  val mapLayoutModifier = remember(lifecycle, savedInstanceState) {
     MapModifier
       .then(
         MapViewInstanceInterceptorNode { instance ->
@@ -88,11 +90,21 @@ public fun NaverMap(
   val mapLayoutNode = remember {
     LayoutNode(
       modifier = mapLayoutModifier then mapContentModifier,
-      factory = { unwrapAppCompat(MapView(context, NaverMapOptions())) },
+      factory = {
+        object : MapViewDelegator {
+          private val lazyInstance by lazy { unwrapAppCompat(MapView(context, NaverMapOptions())) }
+          override val instance: DelegatedMapView get() = lazyInstance
+          override fun getMapAsync(block: (NaverMapDelegator) -> Unit) {
+            lazyInstance.getMapAsync { map -> block(NaverMapDelegator(map)) }
+          }
+        }
+      },
     )
   }
 
-  val mapComposition = remember { Composition(MapApplier(mapLayoutNode), parent = parentCompositionContext) }
+  val mapComposition = remember {
+    Composition(MapApplier(mapLayoutNode), parent = parentCompositionContext)
+  }
 
   LaunchedEffect(mapComposition) {
     @OptIn(InternalComposeApi::class, InternalNaverMapRuntimeApi::class)
@@ -107,7 +119,9 @@ public fun NaverMap(
   }
 
   mapComposition.setContent {
-    CompositionLocalProvider(compositionLocalContext, content = mapContent)
+    CompositionLocalProvider(compositionLocalContext) {
+      NaverMapContentScopeInstance.mapContent()
+    }
   }
 }
 
@@ -115,11 +129,11 @@ public fun NaverMap(
 private class MapViewInstanceInterceptorNode(
   var onReady: ((map: MapView) -> Unit)?,
 ) : MapModifierContributionNode {
-  override val kindSet: ContributionKind = Contributors.MapView
+  override val kindSet = Contributors.MapView
 
-  override fun create(): Contributor = object : MapViewContributor {
-    override fun MapView.contribute() {
-      onReady?.invoke(this)
+  override fun create() = object : MapViewContributor {
+    override fun DelegatedMapView.contribute() {
+      onReady?.invoke(this as MapView)
       onReady = null
     }
   }
@@ -130,8 +144,8 @@ private class MapViewInstanceInterceptorNode(
 
   override fun update(contributor: Contributor) {}
 
-  override fun equals(other: Any?): Boolean = true
-  override fun hashCode(): Int = 0
+  override fun hashCode(): Int = System.identityHashCode(this)
+  override fun equals(other: Any?): Boolean = this === other
 }
 
 private fun unwrapAppCompat(map: MapView) = map.apply {
