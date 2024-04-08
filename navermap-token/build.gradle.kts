@@ -46,5 +46,5 @@ kotlin {
 
 dependencies {
   implementation(libs.navermap)
-  implementation(libs.jetbrains.annotations)
+  implementation(libs.jetbrains.annotation)
 }

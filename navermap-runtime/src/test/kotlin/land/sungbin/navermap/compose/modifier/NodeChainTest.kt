@@ -18,12 +18,12 @@ package land.sungbin.navermap.compose.modifier
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import kotlin.test.Test
 import land.sungbin.navermap.runtime.modifier.ActionReplace
 import land.sungbin.navermap.runtime.modifier.ActionReuse
 import land.sungbin.navermap.runtime.modifier.ActionUpdate
 import land.sungbin.navermap.runtime.modifier.MapModifierNode
 import land.sungbin.navermap.runtime.modifier.dirtyForModifiers
+import kotlin.test.Test
 
 class NodeChainTest {
   @Test fun dirtyForModifiersReuse() {
@@ -52,10 +52,10 @@ class NodeChainTest {
 
 class NothingMapModifierNode : MapModifierNode<Nothing> {
   override fun hashCode(): Int = System.identityHashCode(this)
-  override fun equals(other: Any?) = this.hashCode() == other.hashCode()
+  override fun equals(other: Any?) = this === other
 }
 
 class UnitMapModifierNode : MapModifierNode<Unit> {
   override fun hashCode(): Int = System.identityHashCode(this)
-  override fun equals(other: Any?) = this.hashCode() == other.hashCode()
+  override fun equals(other: Any?) = this === other
 }
