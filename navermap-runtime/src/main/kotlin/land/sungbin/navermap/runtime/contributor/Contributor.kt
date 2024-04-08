@@ -18,5 +18,11 @@ package land.sungbin.navermap.runtime.contributor
 
 import androidx.compose.runtime.Stable
 
+/**
+ * TODO: Write a description of class [Contributor] here.
+ *
+ * `delegate: Owner`: 만약 null이 아닌 값이 반환되면 해당 값을 노드 생성 대신 사용합니다.
+ * `Owner.contribute()`: 주어진 타입의 노드가 생성됐을 때 Owner와 함께 호출됩니다.
+ */
 @Stable
 public sealed interface Contributor
