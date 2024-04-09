@@ -18,6 +18,6 @@ package land.sungbin.navermap.ui
 
 import androidx.compose.runtime.ComposableTargetMarker
 
-@Target(AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.TYPE)
 @ComposableTargetMarker(description = "NaverMap content Composable")
 public annotation class NaverMapContentComposable

@@ -53,13 +53,13 @@ import land.sungbin.navermap.runtime.node.LayoutNode
 import land.sungbin.navermap.ui.contributor.mapLifecycle
 import com.naver.maps.map.R as NaverMapR
 
-private val NoContent: NaverMapContentScope.() -> Unit = {}
+private val NoContent: @[Composable NaverMapContentComposable] NaverMapContentScope.() -> Unit = {}
 
 @Composable
 public fun NaverMap(
   modifier: Modifier = Modifier,
   mapContentModifier: MapModifier = MapModifier,
-  mapContent: NaverMapContentScope.() -> Unit = NoContent,
+  mapContent: @[Composable NaverMapContentComposable] NaverMapContentScope.() -> Unit = NoContent,
 ) {
   val context = LocalContext.current
   val parentComposer = currentComposer
