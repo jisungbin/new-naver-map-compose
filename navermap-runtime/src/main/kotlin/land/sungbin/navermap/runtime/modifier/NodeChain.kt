@@ -17,6 +17,7 @@
 package land.sungbin.navermap.runtime.modifier
 
 import androidx.annotation.VisibleForTesting
+import androidx.collection.IntObjectMap
 import androidx.collection.MutableIntObjectMap
 import androidx.collection.mutableIntObjectMapOf
 import androidx.compose.runtime.collection.MutableVector
@@ -37,13 +38,13 @@ import org.jetbrains.annotations.TestOnly
 
 private typealias ContributorMap = MutableIntObjectMap<MutableVector<Contributor>>
 
-private typealias ContributionNode = MapModifierContributionNode
+internal typealias ContributionNode = MapModifierContributionNode
 private typealias ContributionNodeDirtyMap = MutableIntObjectMap<MutableVector<FlaggedContributionNode>>
 
 private typealias DirtyLevel = Int
 
 @VisibleForTesting
-internal class FlaggedContributionNode(
+internal data class FlaggedContributionNode(
   var cleanNode: ContributionNode? = null,
   var dirtyLevel: DirtyLevel? = null,
   var dirtyNode: ContributionNode? = null,
@@ -71,21 +72,10 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
   private var contributionNodeMap: ContributionNodeDirtyMap? = null
 
   @TestOnly
-  private fun <T> MutableVector<T>.getAsList(): List<T> = asMutableList()
+  internal fun testGetContributorMap() = contributorMap?.asReadOnlyMap()
 
   @TestOnly
-  internal fun testGetContributorMap() = buildMap {
-    contributorMap?.forEach { key, value ->
-      put(key, value.getAsList())
-    }
-  }
-
-  @TestOnly
-  internal fun testGetContributionNodeMap() = buildMap {
-    contributionNodeMap?.forEach { key, value ->
-      put(key, value.getAsList())
-    }
-  }
+  internal fun testGetContributionNodeMap() = contributionNodeMap?.asReadOnlyMap()
 
   inline fun <reified D : Delegator> delegatorOrNull(kind: ContributionKind): D? {
     val contributors = contributorMap ?: return null
@@ -180,18 +170,19 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
     this.contributionNodeMap!!.trim()
   }
 
+  // RandomAccess-based implementations
   fun prepareContributorsFrom(modifier: MapModifier) {
     val prevContributionNodeMap = contributionNodeMap
     val newContributionNodeMap = modifier.contributionNodes()
 
-    val newMapSize = newContributionNodeMap?.size ?: 0
+    val newMapSize = newContributionNodeMap.size
 
     if (prevContributionNodeMap == null && newMapSize == 0) {
       return // Nothing to do (previous and new contributors are empty)
     } else if (prevContributionNodeMap == null && newMapSize > 0) {
       // Initial contributors
       this.contributorMap = mutableIntObjectMapOf()
-      newContributionNodeMap!!.forEach { kind, nodes ->
+      newContributionNodeMap.forEach { kind, nodes ->
         this.contributorMap!![kind] = MutableVector(nodes.size) { index ->
           nodes[index].cleanNode!!.create()
         }
@@ -209,9 +200,9 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
         this.contributionNodeMap!!.forEachValue { nodes ->
           nodes.forEach { it.markRemoving() }
         }
-      } else if (beforeMapSize == newMapSize) {
+      } else if (beforeMapSize == newMapSize && newContributionNodeMap.isSameKeySet(prevContributionNodeMap)) {
         // Reuse nodes as much as possible, if the structure of the contributor hasn't changed.
-        newContributionNodeMap!!.forEach { kind, newNodes ->
+        newContributionNodeMap.forEach { kind, newNodes ->
           val beforeContributionNodeMap = prevContributionNodeMap[kind]!!
 
           val newSize = newNodes.size
@@ -247,21 +238,33 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
             }
             repeat(newSize) { index ->
               this.contributorMap!![kind]!! += newNodes[index].cleanNode!!.create()
-              this.contributionNodeMap!![kind]!! += FlaggedContributionNode(cleanNode = newNodes[index].cleanNode!!)
+              this.contributionNodeMap!![kind]!! += newNodes[index]
             }
           }
         }
-      } else { // newMapSize != 0 && newMapSize != beforeMapSize
+      } else { // newMapSize > 0 && (newMapSize != beforeMapSize || !newContributionNodeMap.isSameKeySet(prevContributionNodeMap))
         // Since the structure of contributors has changed, it cannot be guaranteed that
         // the environment will be the same as before, even if it is the same node. So
         // rebuild contributors from the ground up.
-        newContributionNodeMap!!.forEach { kind, newNodes ->
-          // 1. Removing all previous contributors
-          this.contributionNodeMap!![kind]!!.forEach { it.markRemoving() }
-          // 2. Add new contributors
-          newNodes.forEach { newNode ->
-            this.contributorMap!![kind]!! += newNode.cleanNode!!.create()
-            this.contributionNodeMap!![kind]!! += FlaggedContributionNode(cleanNode = newNode.cleanNode!!)
+
+        // 1. Removing *all* previous contributors
+        supportKindSet.fastForEach { kind ->
+          this.contributionNodeMap!![kind.mask]?.forEach { it.markRemoving() }
+        }
+
+        // 2. Add new contributors
+        newContributionNodeMap.forEach { kind, newNodes ->
+          // New kinds can come in as many kinds as have disappeared.
+          if (prevContributionNodeMap.containsKey(kind)) {
+            newNodes.forEach { newNode ->
+              this.contributorMap!![kind]!! += newNode.cleanNode!!.create()
+              this.contributionNodeMap!![kind]!! += newNode
+            }
+          } else {
+            this.contributorMap!![kind] = MutableVector(newNodes.size) { index ->
+              newNodes[index].cleanNode!!.create()
+            }
+            this.contributionNodeMap!![kind] = newNodes
           }
         }
       }
@@ -303,22 +306,25 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
     validate()
   }
 
-  private fun MapModifier.contributionNodes(): ContributionNodeDirtyMap? {
-    if (this === MapModifier) return null
-    val destination = mutableIntObjectMapOf<MutableVector<FlaggedContributionNode>>()
-    forEachNode { node ->
-      val contribution = node as? ContributionNode ?: return@forEachNode
-      val kindSet = contribution.kindSet
-
+  @VisibleForTesting
+  internal fun MapModifier.contributionNodes(): ContributionNodeDirtyMap {
+    if (this === MapModifier) return MutableIntObjectMap()
+    return foldIn(mutableIntObjectMapOf()) { acc, node ->
+      val contribution = node as? ContributionNode ?: return@foldIn acc
       supportKindSet.fastForEach { kind ->
-        if (kind in kindSet) {
-          val nodes = destination.getOrPut(kind.mask) { mutableVectorOf() }
+        if (kind in contribution.kindSet) {
+          val nodes = acc.getOrPut(kind.mask) { mutableVectorOf() }
           nodes.add(FlaggedContributionNode(cleanNode = contribution))
         }
       }
+      acc
     }
-    return destination
   }
+}
+
+private fun IntObjectMap<*>.isSameKeySet(other: IntObjectMap<*>): Boolean {
+  if (size != other.size) return false
+  return all { key, _ -> other.containsKey(key) }
 }
 
 @VisibleForTesting
@@ -348,3 +354,12 @@ internal fun dirtyForModifiers(prev: MapModifierNode<*>, next: MapModifierNode<*
   } else {
     ActionReplace
   }
+
+private fun <T> MutableVector<T>.getAsList(): List<T> = asMutableList()
+
+@TestOnly
+internal fun <T> IntObjectMap<MutableVector<T>>.asReadOnlyMap() = buildMap {
+  this@asReadOnlyMap.forEach { key, value ->
+    put(key, value.getAsList())
+  }
+}

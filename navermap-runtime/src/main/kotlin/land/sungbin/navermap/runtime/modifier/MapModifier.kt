@@ -17,65 +17,55 @@
 package land.sungbin.navermap.runtime.modifier
 
 import androidx.compose.runtime.Stable
-import kotlin.contracts.contract
 
 @Stable
 public sealed interface MapModifier {
-  public val head: MapModifier?
+  public fun <R> foldIn(initial: R, operation: (R, MapModifierNode<*>) -> R): R
+  public fun <R> foldOut(initial: R, operation: (MapModifierNode<*>, R) -> R): R
+  public fun any(predicate: (MapModifierNode<*>) -> Boolean): Boolean
+  public fun all(predicate: (MapModifierNode<*>) -> Boolean): Boolean
 
-  public infix fun then(other: MapModifierNode<*>): MapModifier =
-    CombinedMapModifier(head = this, tail = other)
+  public infix fun then(other: MapModifier): MapModifier =
+    if (other === MapModifier) this else CombinedMapModifier(this, other)
 
-  public infix fun then(other: MapModifier): MapModifier {
-    if (other !is CombinedMapModifier) return this
-    else {
-      var current = this
-      var traversal = this
-      while (traversal is CombinedMapModifier) {
-        current = current then traversal.tail
-        traversal = traversal.head
-      }
-      return current
-    }
-  }
+  public companion object : MapModifierNode<Nothing> {
+    override fun <R> foldIn(initial: R, operation: (R, MapModifierNode<*>) -> R): R = initial
+    override fun <R> foldOut(initial: R, operation: (MapModifierNode<*>, R) -> R): R = initial
 
-  public companion object : MapModifier {
-    override val head: MapModifier? = null
-    override fun hashCode(): Int = 0
-    override fun equals(other: Any?): Boolean = other === this
+    override fun any(predicate: (MapModifierNode<*>) -> Boolean): Boolean = false
+    override fun all(predicate: (MapModifierNode<*>) -> Boolean): Boolean = true
+
+    override fun hashCode(): Int = System.identityHashCode(this)
+    override fun equals(other: Any?): Boolean = this === other
+
+    override infix fun then(other: MapModifier): MapModifier = other
+    override fun toString(): String = "MapModifier"
   }
 }
 
 @Stable
-internal class CombinedMapModifier(
-  override val head: MapModifier,
-  val tail: MapModifierNode<*>,
+public class CombinedMapModifier(
+  internal val outer: MapModifier,
+  internal val inner: MapModifier,
 ) : MapModifier {
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is CombinedMapModifier) return false
+  override fun <R> foldIn(initial: R, operation: (R, MapModifierNode<*>) -> R): R =
+    inner.foldIn(outer.foldIn(initial, operation), operation)
 
-    if (head != other.head) return false
-    if (tail != other.tail) return false
+  override fun <R> foldOut(initial: R, operation: (MapModifierNode<*>, R) -> R): R =
+    outer.foldOut(inner.foldOut(initial, operation), operation)
 
-    return true
-  }
+  override fun any(predicate: (MapModifierNode<*>) -> Boolean): Boolean =
+    outer.any(predicate) || inner.any(predicate)
 
-  override fun hashCode(): Int {
-    var result = head.hashCode()
-    result = 31 * result + tail.hashCode()
-    return result
-  }
-}
+  override fun all(predicate: (MapModifierNode<*>) -> Boolean): Boolean =
+    outer.all(predicate) && inner.all(predicate)
 
-internal inline fun MapModifier.forEachNode(block: (node: MapModifierNode<*>) -> Unit) {
-  contract { callsInPlace(block) }
-  if (this !is CombinedMapModifier) return
+  override fun equals(other: Any?): Boolean =
+    other is CombinedMapModifier && outer == other.outer && inner == other.inner
 
-  var current: MapModifier? = this
+  override fun hashCode(): Int = outer.hashCode() + 31 * inner.hashCode()
 
-  while (current is CombinedMapModifier) {
-    block(current.tail)
-    current = current.head
-  }
+  override fun toString(): String = "[" + foldIn("") { acc, element ->
+    if (acc.isEmpty()) element.toString() else "$acc, $element"
+  } + "]"
 }

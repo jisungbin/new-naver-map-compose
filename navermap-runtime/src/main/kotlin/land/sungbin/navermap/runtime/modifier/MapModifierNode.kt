@@ -19,9 +19,19 @@ package land.sungbin.navermap.runtime.modifier
 import androidx.compose.runtime.Stable
 
 @Stable
-public interface MapModifierNode<T> {
+public interface MapModifierNode<T> : MapModifier {
   public fun onAttach(instacne: T) {}
   public fun onDetach(instacne: T) {}
+
+  override fun <R> foldIn(initial: R, operation: (R, MapModifierNode<*>) -> R): R =
+    operation(initial, this)
+
+  override fun <R> foldOut(initial: R, operation: (MapModifierNode<*>, R) -> R): R =
+    operation(this, initial)
+
+  override fun any(predicate: (MapModifierNode<*>) -> Boolean): Boolean = predicate(this)
+  override fun all(predicate: (MapModifierNode<*>) -> Boolean): Boolean = predicate(this)
+
   public override fun hashCode(): Int
   public override fun equals(other: Any?): Boolean
 }

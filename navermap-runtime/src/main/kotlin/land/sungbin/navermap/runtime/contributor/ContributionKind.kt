@@ -29,9 +29,9 @@ internal inline infix fun Int.or(other: ContributionKind): Int = this or other.m
 internal inline operator fun Int.contains(value: ContributionKind): Boolean = this and value.mask != 0
 internal inline operator fun ContributionKind.contains(value: ContributionKind): Boolean = this.mask and value.mask != 0
 
+// NOTE: NEVER CHANGE THE VALUE OF THIS BITWISE OPERATION.
 public object Contributors {
-  @Suppress("unused")
-  internal inline val None get() = ContributionKind(0b1 shl 0)
+  internal inline val Any get() = ContributionKind(0b1 shl 0)
   public inline val MapView: ContributionKind get() = ContributionKind(0b1 shl 1)
   public inline val NaverMap: ContributionKind get() = ContributionKind(0b1 shl 2)
   public inline val Overlay: ContributionKind get() = ContributionKind(0b1 shl 3)
