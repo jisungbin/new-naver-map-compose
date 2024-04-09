@@ -30,6 +30,8 @@ import assertk.assertions.isNull
 import assertk.assertions.key
 import assertk.assertions.single
 import assertk.fail
+import io.mockk.mockk
+import io.mockk.verifyAll
 import land.sungbin.navermap.compose.assertion.containsInstanceExactly
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -49,6 +51,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import kotlin.test.Test
 
+// NOTE: APIs such as containsOnly that check whether a particular element
+//  is included are built into assertk, but I don't use them due to differences
+//  in how assertk implements the check I want.
 class NodeChainTest {
   @Test fun dirtyForModifiersReuse() {
     val node = NothingMapModifierNode()
@@ -298,6 +303,10 @@ class NodeChainTest {
       else object : TestBaseContributionNode() {
         override val kindSet = Contributors.NaverMap
         override val contributor = object : EmptyContributor {}
+        override val attacher: OnAttach? = null
+        override val detacher: OnDetach? = null
+        override val createrEffect: OnCreateSideEffect? = null
+        override val updater: OnUpdate? = null
       }
     }
     val newMapViewAndNaverMapNode = run {
@@ -305,6 +314,10 @@ class NodeChainTest {
       else object : TestBaseContributionNode() {
         override val kindSet = Contributors.MapView + Contributors.NaverMap
         override val contributor = object : EmptyContributor {}
+        override val attacher: OnAttach? = null
+        override val detacher: OnDetach? = null
+        override val createrEffect: OnCreateSideEffect? = null
+        override val updater: OnUpdate? = null
       }
     }
 
@@ -571,33 +584,262 @@ class NodeChainTest {
           .containsExactly(newOverlayNode.asCleanFlagged())
       }
   }
+
+  @Test fun trimContributorsUpdateNodes() {
+    val chain = MapModifierNodeChain(listOf(Contributors.MapView, Contributors.NaverMap))
+
+    val updateVerifier = mockk<(Contributor) -> Unit>(relaxed = true)
+
+    val mapViewNode = MapViewContributionNode()
+    val mapViewNode2 = MapViewContributionNode { updateVerifier(it) }
+    val naverMapNode = NaverMapContributionNode()
+    val naverMapNode2 = NaverMapContributionNode { updateVerifier(it) }
+    val mapViewAndNaverMapContributionNode = MapViewAndNaverMapContributionNode()
+    val mapViewAndNaverMapContributionNode2 = MapViewAndNaverMapContributionNode { updateVerifier(it) }
+
+    val initializingModifier = MapModifier
+      .then(mapViewNode)
+      .then(naverMapNode)
+      .then(mapViewAndNaverMapContributionNode)
+    val updatingModifier = MapModifier
+      .then(mapViewNode2)
+      .then(naverMapNode2)
+      .then(mapViewAndNaverMapContributionNode2)
+
+    chain.prepareContributorsFrom(initializingModifier)
+    chain.prepareContributorsFrom(updatingModifier)
+    chain.trimContributors()
+
+    val trimmedContributors = chain.testGetContributorMap()
+    val trimmedContributorNodeMap = chain.testGetContributionNodeMap()
+
+    assertThat(trimmedContributors)
+      .isNotNull()
+      .all {
+        key(Contributors.MapView.mask).containsInstanceExactly(mapViewNode.contributor, mapViewAndNaverMapContributionNode.contributor)
+        key(Contributors.NaverMap.mask).containsInstanceExactly(naverMapNode.contributor, mapViewAndNaverMapContributionNode.contributor)
+      }
+    assertThat(trimmedContributorNodeMap)
+      .isNotNull()
+      .transform { it.values.flatten() }
+      .isAllClean()
+
+    verifyAll {
+      updateVerifier(mapViewNode.contributor)
+      updateVerifier(naverMapNode.contributor)
+      updateVerifier(mapViewAndNaverMapContributionNode.contributor)
+      updateVerifier(mapViewAndNaverMapContributionNode.contributor)
+    }
+  }
+
+  @Test fun trimContributorsReplaceNodes() {
+    val chain = MapModifierNodeChain(
+      listOf(
+        Contributors.Any,
+        Contributors.MapView,
+        Contributors.NaverMap,
+        Contributors.Overlay,
+      ),
+    )
+
+    val attachVerifier = mockk<(Contributor) -> Unit>(relaxed = true)
+    val detachVerifier = mockk<(Contributor) -> Unit>(relaxed = true)
+    val createVerifier = mockk<(Contributor) -> Unit>(relaxed = true)
+    val updateVerifier = mockk<(Contributor) -> Unit>(relaxed = true)
+
+    val node = AnyContributionNode(
+      detacher = { detachVerifier(it) },
+      updater = { updateVerifier(it) },
+    )
+    val node2 = MapViewContributionNode(
+      attacher = { attachVerifier(it) },
+      createrEffect = { createVerifier(it) },
+      updater = { updateVerifier(it) },
+    )
+    val node3 = NaverMapContributionNode(
+      detacher = { detachVerifier(it) },
+      updater = { updateVerifier(it) },
+    )
+    val node4 = OverlayContributionNode(
+      attacher = { attachVerifier(it) },
+      createrEffect = { createVerifier(it) },
+      updater = { updateVerifier(it) },
+    )
+
+    val initializingModifier = MapModifier.then(node).then(node2)
+    val replacingModifier = MapModifier.then(node3).then(node4)
+
+    chain.prepareContributorsFrom(initializingModifier)
+    chain.prepareContributorsFrom(replacingModifier)
+    chain.trimContributors()
+
+    val trimmedContributors = chain.testGetContributorMap()
+    val trimmedContributorNodeMap = chain.testGetContributionNodeMap()
+
+    assertThat(trimmedContributors)
+      .isNotNull()
+      .all {
+        key(Contributors.NaverMap.mask).containsInstanceExactly(node3.contributor)
+        key(Contributors.Overlay.mask).containsInstanceExactly(node4.contributor)
+      }
+    assertThat(trimmedContributorNodeMap)
+      .isNotNull()
+      .transform { it.values.flatten() }
+      .isAllClean()
+  }
+
+  @Test fun trimContributorsDeleteAllRemovedNodes() {
+    val chain = MapModifierNodeChain(listOf(Contributors.MapView, Contributors.NaverMap))
+
+    val mapViewNode = MapViewContributionNode()
+    val mapViewNode2 = MapViewContributionNode()
+    val mapViewNode3 = MapViewContributionNode()
+    val naverMapNode = NaverMapContributionNode()
+    val naverMapNode2 = NaverMapContributionNode()
+
+    val initializingModifier = MapModifier
+      .then(mapViewNode)
+      .then(mapViewNode2)
+      .then(mapViewNode3)
+      .then(naverMapNode)
+      .then(naverMapNode2)
+    val removingModifier = MapModifier then naverMapNode2
+
+    chain.prepareContributorsFrom(initializingModifier)
+    chain.prepareContributorsFrom(removingModifier)
+    chain.trimContributors()
+
+    val trimmedContributors = chain.testGetContributorMap()
+
+    assertThat(trimmedContributors)
+      .isNotNull()
+      .given { maps ->
+        assertThat(maps.keys).single().isEqualTo(Contributors.NaverMap.mask)
+        assertThat(maps.values.flatten()).single().isEqualTo(naverMapNode2.contributor)
+      }
+  }
+
+  @Test fun trimContributorsDeleteAllNodes() {
+    val chain = MapModifierNodeChain(listOf(Contributors.MapView, Contributors.NaverMap))
+
+    val mapViewNode = MapViewContributionNode()
+    val mapViewNode2 = MapViewContributionNode()
+    val mapViewNode3 = MapViewContributionNode()
+    val naverMapNode = NaverMapContributionNode()
+    val naverMapNode2 = NaverMapContributionNode()
+
+    val initializingModifier = MapModifier
+      .then(mapViewNode)
+      .then(mapViewNode2)
+      .then(mapViewNode3)
+      .then(naverMapNode)
+      .then(naverMapNode2)
+    val removingModifier = MapModifier
+
+    chain.prepareContributorsFrom(initializingModifier)
+    chain.prepareContributorsFrom(removingModifier)
+    chain.trimContributors()
+
+    val trimmedContributors = chain.testGetContributorMap()
+
+    assertThat(trimmedContributors)
+      .isNotNull()
+      .isEmpty()
+  }
 }
 
-private class AnyContributionNode(override val contributor: Contributor = object : EmptyContributor {}) : TestBaseContributionNode() {
+private fun interface OnCreateSideEffect {
+  fun action(contributor: Contributor)
+}
+
+private fun interface OnUpdate {
+  fun update(contributor: Contributor)
+}
+
+private fun interface OnAttach {
+  fun attach(instance: Contributor)
+}
+
+private fun interface OnDetach {
+  fun detach(instance: Contributor)
+}
+
+private class AnyContributionNode(
+  override val contributor: Contributor = object : EmptyContributor {},
+  override val attacher: OnAttach? = null,
+  override val detacher: OnDetach? = null,
+  override val createrEffect: OnCreateSideEffect? = null,
+  override val updater: OnUpdate? = null,
+) : TestBaseContributionNode() {
   override val kindSet = Contributors.Any
 }
 
-private class MapViewContributionNode(override val contributor: Contributor = object : EmptyContributor {}) : TestBaseContributionNode() {
+private class MapViewContributionNode(
+  override val contributor: Contributor = object : EmptyContributor {},
+  override val attacher: OnAttach? = null,
+  override val detacher: OnDetach? = null,
+  override val createrEffect: OnCreateSideEffect? = null,
+  override val updater: OnUpdate? = null,
+) : TestBaseContributionNode() {
   override val kindSet = Contributors.MapView
 }
 
-private class NaverMapContributionNode(override val contributor: Contributor = object : EmptyContributor {}) : TestBaseContributionNode() {
+private class NaverMapContributionNode(
+  override val contributor: Contributor = object : EmptyContributor {},
+  override val attacher: OnAttach? = null,
+  override val detacher: OnDetach? = null,
+  override val createrEffect: OnCreateSideEffect? = null,
+  override val updater: OnUpdate? = null,
+) : TestBaseContributionNode() {
   override val kindSet = Contributors.NaverMap
 }
 
-private class MapViewAndNaverMapContributionNode(override val contributor: Contributor = object : EmptyContributor {}) : TestBaseContributionNode() {
+private class MapViewAndNaverMapContributionNode(
+  override val contributor: Contributor = object : EmptyContributor {},
+  override val attacher: OnAttach? = null,
+  override val detacher: OnDetach? = null,
+  override val createrEffect: OnCreateSideEffect? = null,
+  override val updater: OnUpdate? = null,
+) : TestBaseContributionNode() {
   override val kindSet = Contributors.MapView + Contributors.NaverMap
 }
 
-private class OverlayContributionNode(override val contributor: Contributor = object : EmptyContributor {}) : TestBaseContributionNode() {
+private class OverlayContributionNode(
+  override val contributor: Contributor = object : EmptyContributor {},
+  override val attacher: OnAttach? = null,
+  override val detacher: OnDetach? = null,
+  override val createrEffect: OnCreateSideEffect? = null,
+  override val updater: OnUpdate? = null,
+) : TestBaseContributionNode() {
   override val kindSet = Contributors.Overlay
 }
 
 private abstract class TestBaseContributionNode : ContributionNode {
   abstract val contributor: Contributor
+  abstract val createrEffect: OnCreateSideEffect?
+  abstract val updater: OnUpdate?
+  abstract val attacher: OnAttach?
+  abstract val detacher: OnDetach?
+
   abstract override val kindSet: ContributionKind
-  override fun create() = contributor
-  override fun update(contributor: Contributor) {}
+
+  override fun create(): Contributor {
+    createrEffect?.action(contributor)
+    return contributor
+  }
+
+  override fun update(contributor: Contributor) {
+    updater?.update(contributor)
+  }
+
+  override fun onAttach(instacne: Contributor) {
+    attacher?.attach(instacne)
+  }
+
+  override fun onDetach(instacne: Contributor) {
+    detacher?.detach(instacne)
+  }
+
   override fun hashCode(): Int = System.identityHashCode(this)
   override fun equals(other: Any?) = this === other
 }

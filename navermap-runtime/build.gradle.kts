@@ -68,6 +68,7 @@ dependencies {
   testImplementation(kotlin("test"))
   testImplementation(kotlin("reflect")) // optional used in assertk
   testImplementation(libs.test.assertk)
+  testImplementation(libs.test.mockk)
   testImplementation(libs.test.junit5.params)
 
   testImplementation(libs.compose.runtime)

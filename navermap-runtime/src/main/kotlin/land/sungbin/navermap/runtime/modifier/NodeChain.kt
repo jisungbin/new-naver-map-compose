@@ -101,9 +101,10 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
 
   fun trimContributors() {
     val contributions = contributionNodeMap ?: return
-    val contributionsToUpdate = mutableVectorOf<FlaggedContributionNode>()
-    val contributionsToReplace = mutableVectorOf<FlaggedContributionNode>()
-    val contributionsToRemove = mutableVectorOf<FlaggedContributionNode>()
+
+    val contributionsToUpdate = mutableSetOf<FlaggedContributionNode>()
+    val contributionsToReplace = mutableSetOf<FlaggedContributionNode>()
+    val contributionsToRemove = mutableSetOf<FlaggedContributionNode>()
 
     contributions.forEachValue { nodes ->
       nodes.forEach { node ->

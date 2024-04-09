@@ -20,6 +20,7 @@ androidx-collection = "1.4.0"
 jetbrains-annotation = "24.1.0"
 
 test-assertk = "0.28.0"
+test-mockk = "1.13.10"
 test-junit5-params = "5.10.2"
 
 [plugins]
@@ -52,6 +53,7 @@ androidx-collection = { module = "androidx.collection:collection", version.ref =
 jetbrains-annotation = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotation" }
 
 test-assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "test-assertk" }
-test-junit5-params = { module="org.junit.jupiter:junit-jupiter-params", version.ref = "test-junit5-params" }
+test-mockk = { module = "io.mockk:mockk", version.ref = "test-mockk" }
+test-junit5-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "test-junit5-params" }
 
 ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" } # for Renovate
