@@ -53,8 +53,8 @@ kotlin {
 }
 
 dependencies {
-  implementation(libs.compose.runtime)
-  implementation(libs.compose.foundation)
+  compileOnly(libs.compose.runtime)
+  compileOnly(libs.compose.foundation)
 
   api(libs.navermap)
   api(projects.navermapToken)

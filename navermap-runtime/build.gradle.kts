@@ -59,12 +59,15 @@ kotlin {
 }
 
 dependencies {
-  implementation(libs.compose.runtime)
-  implementation(libs.compose.uiutil)
+  compileOnly(libs.compose.runtime)
+  compileOnly(libs.compose.uiutil)
   implementation(libs.androidx.annotation)
   implementation(libs.androidx.collection)
   implementation(libs.jetbrains.annotation)
 
   testImplementation(kotlin("test"))
   testImplementation(libs.test.assertk)
+
+  testImplementation(libs.compose.runtime)
+  testImplementation(libs.compose.uiutil)
 }
