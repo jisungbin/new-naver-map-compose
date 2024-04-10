@@ -52,7 +52,6 @@ class MapNodeTest : CompositionBaseTest() {
                 block(NaverMapDelegator(Any()))
             }
           },
-          onRelease = null,
         )
       },
       update = {},
@@ -83,7 +82,6 @@ class MapNodeTest : CompositionBaseTest() {
               override fun getMapAsync(block: (NaverMapDelegator) -> Unit) = Unit
             }
           },
-          onRelease = null,
         )
       },
       update = {},
@@ -126,7 +124,6 @@ class MapNodeTest : CompositionBaseTest() {
                 override fun onAttached() = attach("layout")
                 override fun onDetached() = detach("layout")
               },
-              onRelease = null,
             )
           },
           update = {},
@@ -190,7 +187,6 @@ class MapNodeTest : CompositionBaseTest() {
                 }
               }
             },
-            onRelease = null,
           )
         },
         update = {},
@@ -220,39 +216,6 @@ class MapNodeTest : CompositionBaseTest() {
     advance()
 
     verify(exactly = 1) { naverMapAttacted() }
-  }
-
-  @Test fun layoutNodeCanReleasing() = compositionTest {
-    val releasing = mockk<() -> Unit>(name = "releasing", relaxed = true)
-
-    var mount by mutableStateOf(true)
-
-    compose {
-      if (mount) {
-        ComposeNode<LayoutNode, MapApplier>(
-          factory = {
-            LayoutNode(
-              factory = {
-                object : MapViewDelegator {
-                  override val instance = Any()
-                  override fun getMapAsync(block: (NaverMapDelegator) -> Unit) = Unit
-                }
-              },
-              onRelease = releasing,
-            )
-          },
-          update = {},
-        )
-      }
-    }
-
-    verifyConsistent()
-    verify(exactly = 0) { releasing() }
-
-    mount = false
-    expectChanges()
-
-    verifySequence { releasing() }
   }
 
   @Test fun overlayNodeWithoutRootCauseError() = compositionTest {

@@ -797,7 +797,7 @@ class NodeChainTest {
     }
   }
 
-  @Test fun trimContributorsDeleteAllNodes() {
+  @Test fun trimContributorsDeleteAllNodesThenNull() {
     val chain = MapModifierNodeChain(listOf(Contributors.MapView, Contributors.NaverMap))
 
     val detachVerifier = mockk<(Contributor) -> Unit>(name = "detach", relaxed = true)
@@ -838,9 +838,7 @@ class NodeChainTest {
 
     val trimmedContributors = chain.testGetContributorMap()
 
-    assertThat(trimmedContributors)
-      .isNotNull()
-      .isEmpty()
+    assertThat(trimmedContributors).isNull()
 
     verifySequence {
       detachVerifier(naverMapNode.contributor)

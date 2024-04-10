@@ -18,7 +18,6 @@ package land.sungbin.navermap.runtime.node
 
 import androidx.compose.runtime.ComposeNodeLifecycleCallback
 import land.sungbin.navermap.runtime.DebugChanges
-import land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi
 import land.sungbin.navermap.runtime.contributor.Contributors
 import land.sungbin.navermap.runtime.delegate.MapViewDelegator
 import land.sungbin.navermap.runtime.delegate.NaverMapDelegator
@@ -32,9 +31,6 @@ public class LayoutNode(
   modifier: MapModifier = MapModifier,
   private var factory: (() -> MapViewDelegator)?,
   private var lifecycle: MapNodeLifecycleCallback = EmptyMapNodeLifecycleCallback,
-  @InternalNaverMapRuntimeApi
-  // Here we expect to dispose of the HostMapNode's composition.
-  public var onRelease: (() -> Unit)?,
 ) : MapNode<MapViewDelegator>(), MapNode.Root, ComposeNodeLifecycleCallback {
   private val nodes = MapModifierNodeChain(supportKindSet = listOf(Contributors.MapView, Contributors.NaverMap))
   internal val mapSymbol: Symbol<NaverMapDelegator> = Symbol()
@@ -81,11 +77,6 @@ public class LayoutNode(
 
   override fun onRelease() {
     detach()
-    val onRelease = onRelease
-    if (onRelease != null) {
-      onRelease.invoke()
-      this.onRelease = null
-    }
   }
 
   private fun MapViewDelegator.followNaverMap() = getMapAsync { map ->

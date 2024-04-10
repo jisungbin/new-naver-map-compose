@@ -178,6 +178,11 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
 
     this.contributorMap!!.trim()
     this.contributionNodeMap!!.trim()
+
+    if (this.contributorMap!!.isEmpty() || this.contributionNodeMap!!.isEmpty()) {
+      this.contributorMap = null
+      this.contributionNodeMap = null
+    }
   }
 
   // RandomAccess-based implementations

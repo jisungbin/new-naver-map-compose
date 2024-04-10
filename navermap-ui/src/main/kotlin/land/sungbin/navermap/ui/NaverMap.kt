@@ -22,17 +22,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.currentCompositionLocalContext
-import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.Ref
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
@@ -61,12 +60,10 @@ public fun NaverMap(
   mapContent: @[Composable NaverMapContentComposable] NaverMapContentScope.() -> Unit = NoContent,
 ) {
   val context = LocalContext.current
-  val parentComposer = currentComposer
-  val parentRecomposeScope = currentRecomposeScope
+  var map by remember { mutableStateOf<MapView?>(null) }
 
-  val map = remember { Ref<MapView>() }
-  if (map.value != null) {
-    AndroidView(modifier = modifier, factory = { map.value!! })
+  if (map != null) {
+    AndroidView(modifier = modifier, factory = { map!! })
   }
 
   val parentCompositionContext = rememberCompositionContext()
@@ -79,12 +76,7 @@ public fun NaverMap(
   val mapComposition = remember { Composition(MapApplier(), parent = parentCompositionContext) }
   val mapLayoutModifier = remember(lifecycle, savedInstanceState) {
     MapModifier
-      .then(
-        MapViewInstanceInterceptorNode { instance ->
-          map.value = instance
-          parentRecomposeScope.invalidate()
-        },
-      )
+      .then(MapViewInstanceInterceptorNode { instance -> map = instance })
       .mapLifecycle(context, lifecycle, previousState, savedInstanceState)
   }
   val mapLayoutNode = remember {
@@ -97,13 +89,6 @@ public fun NaverMap(
           override fun getMapAsync(block: (NaverMapDelegator) -> Unit) {
             lazyInstance.getMapAsync { map -> block(NaverMapDelegator(map)) }
           }
-        }
-      },
-      onRelease = {
-        @OptIn(InternalComposeApi::class)
-        parentComposer.recordSideEffect {
-          mapComposition.dispose()
-          map.value = null
         }
       },
     )
@@ -121,6 +106,13 @@ public fun NaverMap(
       }
     }
   }
+
+  DisposableEffect(mapComposition) {
+    onDispose {
+      mapComposition.dispose()
+      map = null
+    }
+  }
 }
 
 @Immutable
@@ -131,8 +123,11 @@ private class MapViewInstanceInterceptorNode(
 
   override fun create() = object : MapViewContributor {
     override fun DelegatedMapView.contribute() {
-      onReady?.invoke(this as MapView)
-      onReady = null
+      val onReady = onReady
+      if (onReady != null) {
+        onReady.invoke(this as MapView)
+        this@MapViewInstanceInterceptorNode.onReady = null
+      }
     }
   }
 
