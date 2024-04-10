@@ -1089,7 +1089,7 @@ private fun Assert<FlaggedContributionNode>.isRemoving() = given {
     fail("Expected dirtyLevel=$ActionRemove, but got ${it.dirtyLevel}", actual = it)
 
   if (it.dirtyNode == null)
-    fail("Expected dirtyNode!=null, but got null.", expected = it)
+    fail("Expected dirtyNode!=null, but got null.", actual = it)
 
   if (it.cleanNode != null)
     fail("Expected cleanNode=null, but got ${it.cleanNode}", actual = it)
