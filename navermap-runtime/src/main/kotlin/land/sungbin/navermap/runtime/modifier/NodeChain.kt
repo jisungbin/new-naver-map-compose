@@ -102,6 +102,12 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
     }
   }
 
+  // TODO: We should reduce the use of `!!' - we only use it in situations
+  //  where we are guaranteed non-null, but regardless, this operation creates
+  //  an overhead that is not cheap.
+  //  - https://android-review.googlesource.com/c/platform/frameworks/support/+/2392879/comment/4486589a_466a1f3d/
+  //  - https://github.com/JakeWharton/confundus/blob/trunk/README.md#okay-but-why
+
   fun trimContributors() {
     val contributions = contributionNodeMap ?: return
 
