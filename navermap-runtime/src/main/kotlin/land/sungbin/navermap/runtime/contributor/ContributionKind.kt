@@ -35,4 +35,11 @@ public object Contributors {
   public inline val MapView: ContributionKind get() = ContributionKind(0b1 shl 1)
   public inline val NaverMap: ContributionKind get() = ContributionKind(0b1 shl 2)
   public inline val Overlay: ContributionKind get() = ContributionKind(0b1 shl 3)
+
+  public fun names(contributors: ContributionKind): List<String> = buildList {
+    if (Any in contributors) add("Any")
+    if (MapView in contributors) add("MapView")
+    if (NaverMap in contributors) add("NaverMap")
+    if (Overlay in contributors) add("Overlay")
+  }
 }

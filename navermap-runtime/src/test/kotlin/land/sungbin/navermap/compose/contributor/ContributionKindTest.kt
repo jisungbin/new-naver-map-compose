@@ -18,6 +18,7 @@ package land.sungbin.navermap.compose.contributor
 
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
@@ -45,5 +46,10 @@ class ContributionKindTest {
     val anyOrMapViewOrNaverMap = Contributors.Any or Contributors.MapView or Contributors.MapView
     assertThat(Contributors.MapView in anyOrMapViewOrNaverMap).isTrue()
     assertThat(Contributors.Overlay in anyOrMapViewOrNaverMap).isFalse()
+  }
+
+  @Test fun names() {
+    val kinds = Contributors.Any + Contributors.MapView + Contributors.NaverMap + Contributors.Overlay
+    assertThat(Contributors.names(kinds)).containsExactly("Any", "MapView", "NaverMap", "Overlay")
   }
 }

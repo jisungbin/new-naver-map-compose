@@ -87,7 +87,8 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
         else -> null
       }
       if (delegate is D) {
-        if (acc != null) error("[$kind] delegate was provided multiple times.")
+        if (acc != null)
+          error("[${Contributors.names(kind).joinToString()}] delegate instance was provided multiple times.")
         delegate
       } else acc
     }
@@ -96,7 +97,9 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
   /* prepareContributorsFrom -> trimContributors -> (lazy) contributes */
   fun contributes(delegator: Delegator, kind: ContributionKind) {
     val contributors = contributorMap ?: return
-    contributors[kind.mask]?.forEach { contributor -> contributor.execute(delegator, kind) }
+    contributors[kind.mask]?.forEach { contributor ->
+      contributor.execute(delegator, kind)
+    }
   }
 
   fun trimContributors() {
@@ -185,7 +188,9 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
       this.contributorMap = mutableIntObjectMapOf()
       newContributionNodeMap.forEach { kind, nodes ->
         this.contributorMap!![kind] = MutableVector(nodes.size) { index ->
-          nodes[index].cleanNode!!.create()
+          nodes[index].cleanNode!!.create().also {
+            nodes[index].cleanNode!!.onAttach(it)
+          }
         }
       }
       this.contributionNodeMap = newContributionNodeMap
@@ -238,7 +243,9 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
               this.contributionNodeMap!![kind]!![index].markRemoving()
             }
             repeat(newSize) { index ->
-              this.contributorMap!![kind]!! += newNodes[index].cleanNode!!.create()
+              this.contributorMap!![kind]!! += newNodes[index].cleanNode!!.create().also {
+                newNodes[index].cleanNode!!.onAttach(it)
+              }
               this.contributionNodeMap!![kind]!! += newNodes[index]
             }
           }
@@ -258,12 +265,16 @@ internal class MapModifierNodeChain(private val supportKindSet: List<Contributio
           // New kinds can come in as many kinds as have disappeared.
           if (prevContributionNodeMap.containsKey(kind)) {
             newNodes.forEach { newNode ->
-              this.contributorMap!![kind]!! += newNode.cleanNode!!.create()
+              this.contributorMap!![kind]!! += newNode.cleanNode!!.create().also {
+                newNode.cleanNode!!.onAttach(it)
+              }
               this.contributionNodeMap!![kind]!! += newNode
             }
           } else {
             this.contributorMap!![kind] = MutableVector(newNodes.size) { index ->
-              newNodes[index].cleanNode!!.create()
+              newNodes[index].cleanNode!!.create().also {
+                newNodes[index].cleanNode!!.onAttach(it)
+              }
             }
             this.contributionNodeMap!![kind] = newNodes
           }
