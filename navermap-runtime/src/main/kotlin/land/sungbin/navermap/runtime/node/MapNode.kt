@@ -16,34 +16,35 @@
 
 package land.sungbin.navermap.runtime.node
 
-import androidx.annotation.CallSuper
-import androidx.compose.runtime.ComposeNodeLifecycleCallback
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi
 import land.sungbin.navermap.runtime.delegate.Delegator
-import org.jetbrains.annotations.ApiStatus.OverrideOnly
 
-public abstract class MapNode<D : Delegator>(
-  @InternalNaverMapRuntimeApi // Called when the node is removed from the composition
-  public var onCompositionReleaseRequest: (() -> Unit)? = null,
-) : ComposeNodeLifecycleCallback {
+public sealed class MapNode<D : Delegator> {
+  internal sealed interface Root
+  internal sealed interface Child {
+    var layoutNode: LayoutNode?
+    var isAttached: Boolean
+    fun attachIfReady()
+  }
+
   protected val children: MutableVector<MapNode<*>> = mutableVectorOf()
 
   @InternalNaverMapRuntimeApi
   public val delegator: Symbol<D> = Symbol()
 
   public abstract fun attach()
-
-  // OverrideOnly: Auto call when the node is removed from the composition
-  @OverrideOnly
-  @InternalNaverMapRuntimeApi
   public abstract fun detach()
 
+  /** @see [androidx.compose.ui.node.LayoutNode.insertAt] */
+  @Suppress("KDocUnresolvedReference")
   public fun insertAt(index: Int, instance: MapNode<*>) {
     children.add(index, instance)
   }
 
+  /** @see [androidx.compose.ui.node.LayoutNode.removeAt] */
+  @Suppress("KDocUnresolvedReference")
   public fun removeAt(index: Int, count: Int) {
     require(count >= 0) { "count ($count) must be greater than 0" }
     for (i in index + count - 1 downTo index) {
@@ -51,6 +52,8 @@ public abstract class MapNode<D : Delegator>(
     }
   }
 
+  /** @see [androidx.compose.ui.node.LayoutNode.move] */
+  @Suppress("KDocUnresolvedReference")
   public fun move(from: Int, to: Int, count: Int) {
     if (from == to) return
 
@@ -62,28 +65,9 @@ public abstract class MapNode<D : Delegator>(
     }
   }
 
+  /** @see [androidx.compose.ui.node.LayoutNode.removeAll] */
+  @Suppress("KDocUnresolvedReference")
   public fun removeAll() {
-    for (i in children.size - 1 downTo 0) {
-      children.removeAt(i)
-    }
-  }
-
-  override fun onReuse() {
-    // Nothing to do
-  }
-
-  override fun onDeactivate() {
-    // Nothing to do
-  }
-
-  @CallSuper
-  override fun onRelease() {
-    children.forEach(MapNode<*>::detach)
-    val onCompositionReleaseRequest = onCompositionReleaseRequest
-    // Only root node has onCompositionReleaseRequest callback
-    if (onCompositionReleaseRequest != null) {
-      onCompositionReleaseRequest.invoke()
-      this.onCompositionReleaseRequest = null
-    }
+    children.clear()
   }
 }

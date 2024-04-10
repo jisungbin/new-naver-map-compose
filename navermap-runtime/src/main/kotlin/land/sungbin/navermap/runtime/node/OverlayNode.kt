@@ -16,6 +16,9 @@
 
 package land.sungbin.navermap.runtime.node
 
+import androidx.compose.runtime.ComposeNodeLifecycleCallback
+import land.sungbin.navermap.runtime.DebugChanges
+import land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi
 import land.sungbin.navermap.runtime.contributor.Contributors
 import land.sungbin.navermap.runtime.delegate.OverlayDelegator
 import land.sungbin.navermap.runtime.modifier.MapModifier
@@ -24,20 +27,19 @@ import land.sungbin.navermap.runtime.modifier.MapModifierNodeChain
 public typealias DelegatedOverlay = Any
 
 public class OverlayNode(
-  modifier: MapModifier,
+  modifier: MapModifier = MapModifier,
   private var factory: (() -> OverlayDelegator)?,
-  internal var layoutNode: LayoutNode? = null,
+  @InternalNaverMapRuntimeApi
+  override var layoutNode: LayoutNode? = null,
   private var lifecycle: MapNodeLifecycleCallback = EmptyMapNodeLifecycleCallback,
-) : MapNode<OverlayDelegator>() {
+) : MapNode<OverlayDelegator>(), MapNode.Child, ComposeNodeLifecycleCallback {
   private val nodes = MapModifierNodeChain(supportKindSet = listOf(Contributors.Overlay))
-
-  internal var isAttached: Boolean = false
-    private set
+  override var isAttached: Boolean = false
 
   init {
+    if (DebugChanges) println("OverlayNode init ($this)")
     requireNotNull(factory) { "The factory argument in the OverlayNode constructor must be non-null." }
     nodes.prepareContributorsFrom(modifier)
-    if (layoutNode().mapSymbol.isBound()) attach()
   }
 
   public var modifier: MapModifier = modifier
@@ -48,23 +50,48 @@ public class OverlayNode(
       field = value
     }
 
+  override fun attachIfReady() {
+    if (
+      !isAttached &&
+      layoutNode?.delegator?.isBound() == true &&
+      layoutNode?.mapSymbol?.isBound() == true
+    )
+      attach()
+  }
+
   override fun attach() {
-    val delegateIfExist = nodes.delegatorOrNull<OverlayDelegator>(Contributors.Overlay)
-    delegator.bound(delegateIfExist ?: factory!!())
-    factory = null
-    delegator.owner.setMap(layoutNode().naverMap())
+    if (DebugChanges) println("attach $this")
+    if (!delegator.isBound()) {
+      val delegateIfExist = nodes.delegatorOrNull<OverlayDelegator>(Contributors.Overlay)
+      delegator.bound(delegateIfExist ?: factory!!())
+      delegator.owner.setMap(layoutNode().naverMap())
+      factory = null
+      isAttached = true
+    }
     lifecycle.onAttached()
     nodes.contributes(delegator.owner, Contributors.Overlay)
-    isAttached = true
   }
 
   override fun detach() {
-    delegator.owner.setMap(null)
+    if (DebugChanges) println("detach $this")
+    if (delegator.isBound()) delegator.owner.setMap(null)
     delegator.unbound()
     modifier = MapModifier // Remove all contributors
     lifecycle.onDetached()
     lifecycle = EmptyMapNodeLifecycleCallback
     layoutNode = null
+  }
+
+  override fun onReuse() {
+    // TODO: Supports Overlay reusing.
+    //  Overlays that are not currently visible on the map can be reused.
+    //  - https://android-review.googlesource.com/c/platform/frameworks/support/+/2392879/27/compose/runtime/runtime/src/commonTest/kotlin/androidx/compose/runtime/CompositionReusingTests.kt
+  }
+
+  override fun onDeactivate() {}
+
+  override fun onRelease() {
+    detach()
   }
 
   @Suppress("NOTHING_TO_INLINE")

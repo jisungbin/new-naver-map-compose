@@ -34,6 +34,14 @@ android {
     getByName("test").java.srcDir("src/main/kotlin")
   }
 
+  buildFeatures {
+    compose = true
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+  }
+
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -43,11 +51,15 @@ android {
     compileOptions {
       freeCompilerArgs = freeCompilerArgs + listOf(
         "-opt-in=land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi",
+        "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+        "-opt-in=androidx.compose.runtime.InternalComposeApi",
       )
     }
   }
 
   testOptions.unitTests {
+    isReturnDefaultValues = true
+    isIncludeAndroidResources = true
     all { test ->
       test.useJUnitPlatform()
     }
@@ -70,6 +82,7 @@ dependencies {
   testImplementation(libs.test.assertk)
   testImplementation(libs.test.mockk)
   testImplementation(libs.test.junit5.params)
+  testImplementation(libs.test.kotlin.coroutines)
 
   testImplementation(libs.compose.runtime)
   testImplementation(libs.compose.uiutil)

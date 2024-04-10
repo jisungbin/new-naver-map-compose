@@ -16,17 +16,7 @@
 
 package land.sungbin.navermap.runtime.node
 
-public class Symbol<T> internal constructor() {
-  private var value: T? = null
-  public val owner: T get() = value ?: error("Symbol is not bound")
-
-  internal fun unbound() {
-    value = null
-  }
-
-  internal fun bound(value: T, force: Boolean = false) {
-    if (force || this.value == null) this.value = value
-  }
-
-  internal fun isBound(): Boolean = value != null
+public class HostMapNode internal constructor() : MapNode<Nothing>() {
+  override fun attach(): Unit = Unit
+  override fun detach(): Unit = Unit
 }

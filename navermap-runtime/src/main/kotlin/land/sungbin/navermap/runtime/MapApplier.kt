@@ -16,53 +16,59 @@
 
 package land.sungbin.navermap.runtime
 
-import androidx.compose.runtime.Applier
-import androidx.compose.ui.util.fastForEach
+import androidx.compose.runtime.AbstractApplier
+import land.sungbin.navermap.runtime.node.HostMapNode
 import land.sungbin.navermap.runtime.node.LayoutNode
 import land.sungbin.navermap.runtime.node.MapNode
-import land.sungbin.navermap.runtime.node.OverlayNode
+import org.jetbrains.annotations.TestOnly
 
-public class MapApplier(private val root: LayoutNode) : Applier<MapNode<*>> {
-  private val stack = mutableListOf<MapNode<*>>()
-  override var current: MapNode<*> = root
-    private set
+/** Enable to log changes to the LayoutNode tree. This logging is quite chatty. */
+@set:TestOnly
+internal var DebugChanges = false
 
-  init {
-    root.attach()
-  }
+public class MapApplier(host: HostMapNode = HostMapNode()) : AbstractApplier<MapNode<*>>(host) {
+  private var layoutNode: LayoutNode? = null
 
   override fun down(node: MapNode<*>) {
-    if (node is OverlayNode) node.layoutNode = root
-    stack.add(current)
-    current = node
+    if (DebugChanges) println("down $node")
+    if (node is MapNode.Root) node.attach()
+    if (node is MapNode.Child) node.attachIfReady()
+    super.down(node)
   }
 
   override fun up() {
-    check(stack.isNotEmpty()) { "empty stack" }
-    current = stack.removeAt(stack.size - 1)
+    if (DebugChanges) println("up")
+    super.up()
   }
 
   override fun insertTopDown(index: Int, instance: MapNode<*>) {
-    // Ignored. Insert is performed in [insertBottomUp] to build the tree bottom-up to
-    // avoid duplicate notification when the child nodes enter the tree
-  }
-
-  override fun insertBottomUp(index: Int, instance: MapNode<*>) {
-    if (instance is OverlayNode) instance.layoutNode = root
+    if (DebugChanges) println("insertTopDown $instance at $index")
+    if (instance is LayoutNode && layoutNode == null) layoutNode = instance
+    if (instance is MapNode.Child) {
+      val parent = checkNotNull(layoutNode) { "OverlayNode must be added as a child of LayoutNode." }
+      instance.layoutNode = parent
+    }
     current.insertAt(index, instance)
   }
 
-  override fun move(from: Int, to: Int, count: Int) {
-    current.move(from, to, count)
+  override fun insertBottomUp(index: Int, instance: MapNode<*>) {
+    if (DebugChanges) println("IGNORE insertBottomUp $instance at $index")
+    // Ignored. 'insertTopDown' is used to use a top-down linear structure.
   }
 
   override fun remove(index: Int, count: Int) {
+    if (DebugChanges) println("remove $count at $index")
     current.removeAt(index, count)
   }
 
-  override fun clear() {
-    stack.fastForEach(MapNode<*>::removeAll)
-    stack.clear()
-    current = root.also(MapNode<*>::removeAll)
+  override fun move(from: Int, to: Int, count: Int) {
+    if (DebugChanges) println("move $count from $from to $to")
+    current.move(from, to, count)
+  }
+
+  override fun onClear() {
+    if (DebugChanges) println("onClear")
+    root.removeAll()
+    layoutNode = null
   }
 }

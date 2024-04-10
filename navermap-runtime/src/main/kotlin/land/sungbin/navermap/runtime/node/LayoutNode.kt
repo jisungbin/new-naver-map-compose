@@ -16,6 +16,9 @@
 
 package land.sungbin.navermap.runtime.node
 
+import androidx.compose.runtime.ComposeNodeLifecycleCallback
+import land.sungbin.navermap.runtime.DebugChanges
+import land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi
 import land.sungbin.navermap.runtime.contributor.Contributors
 import land.sungbin.navermap.runtime.delegate.MapViewDelegator
 import land.sungbin.navermap.runtime.delegate.NaverMapDelegator
@@ -26,14 +29,18 @@ public typealias DelegatedMapView = Any
 public typealias DelegatedNaverMap = Any
 
 public class LayoutNode(
-  modifier: MapModifier,
+  modifier: MapModifier = MapModifier,
   private var factory: (() -> MapViewDelegator)?,
   private var lifecycle: MapNodeLifecycleCallback = EmptyMapNodeLifecycleCallback,
-) : MapNode<MapViewDelegator>() {
+  @InternalNaverMapRuntimeApi
+  // Here we expect to dispose of the HostMapNode's composition.
+  public var onRelease: (() -> Unit)?,
+) : MapNode<MapViewDelegator>(), MapNode.Root, ComposeNodeLifecycleCallback {
   private val nodes = MapModifierNodeChain(supportKindSet = listOf(Contributors.MapView, Contributors.NaverMap))
   internal val mapSymbol: Symbol<NaverMapDelegator> = Symbol()
 
   init {
+    if (DebugChanges) println("LayoutNode init ($this)")
     requireNotNull(factory) { "The factory argument in the LayoutNode constructor must be non-null." }
     nodes.prepareContributorsFrom(modifier)
   }
@@ -48,15 +55,20 @@ public class LayoutNode(
     }
 
   override fun attach() {
-    val delegatorIfExist = nodes.delegatorOrNull<MapViewDelegator>(Contributors.MapView)
-    delegator.bound(delegatorIfExist ?: factory!!())
-    factory = null
+    if (DebugChanges) println("attach $this")
+    if (!delegator.isBound()) {
+      val delegatorIfExist = nodes.delegatorOrNull<MapViewDelegator>(Contributors.MapView)
+      delegator.bound(delegatorIfExist ?: factory!!())
+      factory = null
+    }
     lifecycle.onAttached()
-    nodes.contributes(delegator.owner, Contributors.NaverMap)
-    delegator.owner.followNaverMap()
+    nodes.contributes(delegator.owner, Contributors.MapView)
+    if (!mapSymbol.isBound()) delegator.owner.followNaverMap()
+    else nodes.contributes(mapSymbol.owner, Contributors.NaverMap)
   }
 
   override fun detach() {
+    if (DebugChanges) println("detach $this")
     delegator.unbound()
     mapSymbol.unbound()
     modifier = MapModifier // Remove all contributors
@@ -64,11 +76,23 @@ public class LayoutNode(
     lifecycle = EmptyMapNodeLifecycleCallback
   }
 
+  override fun onReuse() {}
+  override fun onDeactivate() {}
+
+  override fun onRelease() {
+    detach()
+    val onRelease = onRelease
+    if (onRelease != null) {
+      onRelease.invoke()
+      this.onRelease = null
+    }
+  }
+
   private fun MapViewDelegator.followNaverMap() = getMapAsync { map ->
     mapSymbol.bound(map)
     nodes.contributes(map, Contributors.NaverMap)
-    this@LayoutNode.children.forEach { node ->
-      if (node is OverlayNode && !node.isAttached) node.attach()
+    children.forEach { node ->
+      if (node is Child && !node.isAttached) node.attach()
     }
   }
 }
