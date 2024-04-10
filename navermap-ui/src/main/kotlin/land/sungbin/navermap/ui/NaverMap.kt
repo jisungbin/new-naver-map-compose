@@ -19,11 +19,11 @@ package land.sungbin.navermap.ui
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.InternalComposeApi
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.currentRecomposeScope
@@ -39,7 +39,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import com.naver.maps.map.MapView
 import com.naver.maps.map.NaverMapOptions
-import land.sungbin.navermap.runtime.InternalNaverMapRuntimeApi
 import land.sungbin.navermap.runtime.MapApplier
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors
@@ -77,6 +76,7 @@ public fun NaverMap(
   val previousState = remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
   val savedInstanceState = rememberSaveable { Bundle() }
 
+  val mapComposition = remember { Composition(MapApplier(), parent = parentCompositionContext) }
   val mapLayoutModifier = remember(lifecycle, savedInstanceState) {
     MapModifier
       .then(
@@ -99,28 +99,26 @@ public fun NaverMap(
           }
         }
       },
+      onRelease = {
+        @OptIn(InternalComposeApi::class)
+        parentComposer.recordSideEffect {
+          mapComposition.dispose()
+          map.value = null
+        }
+      },
     )
-  }
-
-  val mapComposition = remember {
-    Composition(MapApplier(mapLayoutNode), parent = parentCompositionContext)
-  }
-
-  LaunchedEffect(mapComposition) {
-    @OptIn(InternalComposeApi::class, InternalNaverMapRuntimeApi::class)
-    mapLayoutNode.onCompositionReleaseRequest = {
-      parentComposer.recordSideEffect(mapComposition::dispose)
-      map.value = null
-    }
-  }
-
-  LaunchedEffect(mapContentModifier) {
-    mapLayoutNode.modifier = mapLayoutModifier then mapContentModifier
   }
 
   mapComposition.setContent {
     CompositionLocalProvider(compositionLocalContext) {
-      NaverMapContentScopeInstance.mapContent()
+      ComposeNode<LayoutNode, MapApplier>(
+        factory = { mapLayoutNode },
+        update = {
+          update(mapContentModifier) { this.modifier = mapLayoutModifier then mapContentModifier }
+        },
+      ) {
+        NaverMapContentScopeInstance.mapContent()
+      }
     }
   }
 }
