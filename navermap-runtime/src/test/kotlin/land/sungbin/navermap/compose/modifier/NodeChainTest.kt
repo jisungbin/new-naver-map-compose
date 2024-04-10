@@ -22,6 +22,7 @@ import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.doesNotContainKey
+import assertk.assertions.each
 import assertk.assertions.hasMessage
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
@@ -1081,9 +1082,7 @@ private fun Assert<FlaggedContributionNode>.isClean() = given {
     fail("Expected dirtyLevel=null, but got ${it.dirtyLevel}", actual = it)
 }
 
-private fun Assert<List<FlaggedContributionNode>>.isAllClean() = given { nodes ->
-  nodes.forEach { assertThat(it).isClean() }
-}
+private fun Assert<List<FlaggedContributionNode>>.isAllClean() = each { it.isClean() }
 
 private fun Assert<FlaggedContributionNode>.isRemoving() = given {
   if (it.dirtyLevel != ActionRemove)
@@ -1096,6 +1095,4 @@ private fun Assert<FlaggedContributionNode>.isRemoving() = given {
     fail("Expected cleanNode=null, but got ${it.cleanNode}", actual = it)
 }
 
-private fun Assert<List<FlaggedContributionNode>>.isAllRemoving() = given { nodes ->
-  nodes.forEach { assertThat(it).isRemoving() }
-}
+private fun Assert<List<FlaggedContributionNode>>.isAllRemoving() = each { it.isRemoving() }
