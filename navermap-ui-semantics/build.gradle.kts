@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:Suppress("UnstableApiUsage")
-
 plugins {
   id("com.android.library")
   kotlin("android")
@@ -22,7 +20,7 @@ plugins {
 }
 
 android {
-  namespace = "land.sungbin.navermap.token"
+  namespace = "land.sungbin.navermap.ui.semantics"
   compileSdk = 34
 
   defaultConfig {
@@ -42,9 +40,4 @@ android {
 
 kotlin {
   explicitApi()
-}
-
-dependencies {
-  implementation(libs.navermap)
-  implementation(libs.jetbrains.annotation)
 }

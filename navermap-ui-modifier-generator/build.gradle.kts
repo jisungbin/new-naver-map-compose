@@ -18,11 +18,10 @@
 plugins {
   id("com.android.library")
   kotlin("android")
-  id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
 android {
-  namespace = "land.sungbin.navermap.compose"
+  namespace = "land.sungbin.navermap.ui.modifier.generator"
   compileSdk = 34
 
   defaultConfig {
@@ -38,25 +37,14 @@ android {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
   }
-
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-  }
-}
-
-kotlin {
-  explicitApi()
 }
 
 dependencies {
-  compileOnly(libs.compose.runtime)
-  compileOnly(libs.compose.foundation)
+  implementation(libs.navermap)
+  implementation(libs.classgraph)
+  implementation(libs.kotlinpoet)
+  implementation(projects.navermapRuntime)
 
-  api(libs.navermap)
-  api(projects.navermapRuntime)
-  api(projects.navermapUiModifier)
+  // noinspection UseTomlInstead (debug only)
+  implementation("com.google.code.gson:gson:2.10.1")
 }

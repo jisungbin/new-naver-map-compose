@@ -20,6 +20,9 @@ androidx-annotation = "1.7.1"
 androidx-collection = "1.4.0"
 jetbrains-annotation = "24.1.0"
 
+classgraph = "4.8.170"
+kotlinpoet = "1.16.0"
+
 test-assertk = "0.28.0"
 test-mockk = "1.13.10"
 test-junit5-params = "5.10.2"
@@ -48,6 +51,8 @@ compose-material = { module = "androidx.compose.material:material", version.ref 
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 
 navermap = { module = "com.naver.maps:map-sdk", version.ref = "compose-navermap" }
+classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 androidx-collection = { module = "androidx.collection:collection", version.ref = "androidx-collection" }

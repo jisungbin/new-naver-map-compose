@@ -1,6 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-rootProject.name = "TokenizableNaverMapCompose"
+rootProject.name = "naver-map-compose"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
@@ -26,7 +26,10 @@ buildCache {
 
 include(
   ":sample",
-  ":navermap-ui",
   ":navermap-runtime",
-  ":navermap-token",
+  ":navermap-ui",
+  ":navermap-ui-semantics",
+  ":navermap-ui-modifier",
+  ":navermap-ui-modifier-generator",
+  ":navermap-test",
 )

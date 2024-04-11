@@ -13,13 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package land.sungbin.navermap.token
-
-import com.naver.maps.map.overlay.Overlay
-import org.jetbrains.annotations.Contract
-
-public abstract class OverlayFactory<O : Overlay> {
-  @Contract(pure = true)
-  public abstract fun createOverlay(): O
+plugins {
+  kotlin("jvm")
+  id(libs.plugins.gradle.publish.maven.get().pluginId)
 }

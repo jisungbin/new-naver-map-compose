@@ -22,7 +22,7 @@ plugins {
 }
 
 android {
-  namespace = "land.sungbin.navermap.compose"
+  namespace = "land.sungbin.navermap.ui.modifier"
   compileSdk = 34
 
   defaultConfig {
@@ -38,14 +38,6 @@ android {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
   }
-
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-  }
 }
 
 kotlin {
@@ -53,10 +45,7 @@ kotlin {
 }
 
 dependencies {
-  compileOnly(libs.compose.runtime)
-  compileOnly(libs.compose.foundation)
-
-  api(libs.navermap)
-  api(projects.navermapRuntime)
-  api(projects.navermapUiModifier)
+  implementation(projects.navermapRuntime)
+  implementation(libs.navermap)
+  implementation(libs.jetbrains.annotation)
 }
