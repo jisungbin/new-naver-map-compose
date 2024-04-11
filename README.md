@@ -1,3 +1,3 @@
-# Tokenizable NAVER Map Compose 🗺
+# New NAVER Map Compose 🗺✨
 
 WIP
