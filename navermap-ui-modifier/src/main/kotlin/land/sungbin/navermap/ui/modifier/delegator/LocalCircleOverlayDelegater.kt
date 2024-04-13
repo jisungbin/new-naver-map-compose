@@ -21,5 +21,5 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import land.sungbin.navermap.ui.modifier.circleoverlay.CircleOverlayDelegate
 import land.sungbin.navermap.ui.modifier.circleoverlay.RealCircleOverlayDelegate
 
-public val LocalCircleOverlayDelegater: ProvidableCompositionLocal<CircleOverlayDelegate> =
+public val LocalCircleOverlayDelegator: ProvidableCompositionLocal<CircleOverlayDelegate> =
   staticCompositionLocalOf { RealCircleOverlayDelegate }

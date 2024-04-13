@@ -20,5 +20,5 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 
 @Suppress("unused")
-val LocalMarkerDelegater: ProvidableCompositionLocal<MarkerDelegate> =
+val LocalMarkerDelegator: ProvidableCompositionLocal<MarkerDelegate> =
   staticCompositionLocalOf { RealMarkerDelegate }

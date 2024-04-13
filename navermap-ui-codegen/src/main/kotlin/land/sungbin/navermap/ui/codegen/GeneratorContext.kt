@@ -67,7 +67,7 @@ internal class GeneratorContext(
       NameFlag.MODIFIER_EXTENSION -> name.normalizeLowercase() // MarkerModifier.[offset]
       NameFlag.CONTRIBUTOR -> "${overlayClass.simpleName}${name.normalizeUppercase()}Contributor" // MarkerLatLngContributor
       NameFlag.CONTRIBUTION_NODE -> "${overlayClass.simpleName}${name.normalizeUppercase()}ContributionNode" // MarkerLatLngContributionNode
-      NameFlag.COMPOSITION_LOCAL -> "Local${overlayClass.simpleName}Delegater" // LocalMarkerDelegater
+      NameFlag.COMPOSITION_LOCAL -> "Local${overlayClass.simpleName}Delegator" // LocalMarkerDelegator
     }
 
   fun noopDelegator() = buildCodeBlock {

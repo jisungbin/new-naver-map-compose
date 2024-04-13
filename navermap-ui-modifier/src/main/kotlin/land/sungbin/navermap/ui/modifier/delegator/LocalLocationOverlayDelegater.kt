@@ -21,5 +21,5 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import land.sungbin.navermap.ui.modifier.locationoverlay.LocationOverlayDelegate
 import land.sungbin.navermap.ui.modifier.locationoverlay.RealLocationOverlayDelegate
 
-public val LocalLocationOverlayDelegater: ProvidableCompositionLocal<LocationOverlayDelegate> =
+public val LocalLocationOverlayDelegator: ProvidableCompositionLocal<LocationOverlayDelegate> =
   staticCompositionLocalOf { RealLocationOverlayDelegate }

@@ -21,7 +21,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import land.sungbin.navermap.ui.modifier.multipartpathoverlay.MultipartPathOverlayDelegate
 import land.sungbin.navermap.ui.modifier.multipartpathoverlay.RealMultipartPathOverlayDelegate
 
-public val LocalMultipartPathOverlayDelegater:
+public val LocalMultipartPathOverlayDelegator:
   ProvidableCompositionLocal<MultipartPathOverlayDelegate> = staticCompositionLocalOf {
     RealMultipartPathOverlayDelegate
   }

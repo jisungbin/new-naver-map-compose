@@ -21,5 +21,5 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import land.sungbin.navermap.ui.modifier.marker.MarkerDelegate
 import land.sungbin.navermap.ui.modifier.marker.RealMarkerDelegate
 
-public val LocalMarkerDelegater: ProvidableCompositionLocal<MarkerDelegate> =
+public val LocalMarkerDelegator: ProvidableCompositionLocal<MarkerDelegate> =
   staticCompositionLocalOf { RealMarkerDelegate }

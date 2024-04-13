@@ -21,5 +21,5 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import land.sungbin.navermap.ui.modifier.polylineoverlay.PolylineOverlayDelegate
 import land.sungbin.navermap.ui.modifier.polylineoverlay.RealPolylineOverlayDelegate
 
-public val LocalPolylineOverlayDelegater: ProvidableCompositionLocal<PolylineOverlayDelegate> =
+public val LocalPolylineOverlayDelegator: ProvidableCompositionLocal<PolylineOverlayDelegate> =
   staticCompositionLocalOf { RealPolylineOverlayDelegate }

@@ -21,5 +21,5 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import land.sungbin.navermap.ui.modifier.infowindow.InfoWindowDelegate
 import land.sungbin.navermap.ui.modifier.infowindow.RealInfoWindowDelegate
 
-public val LocalInfoWindowDelegater: ProvidableCompositionLocal<InfoWindowDelegate> =
+public val LocalInfoWindowDelegator: ProvidableCompositionLocal<InfoWindowDelegate> =
   staticCompositionLocalOf { RealInfoWindowDelegate }

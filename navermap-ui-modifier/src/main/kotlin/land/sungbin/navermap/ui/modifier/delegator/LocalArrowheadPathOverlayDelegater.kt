@@ -21,7 +21,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import land.sungbin.navermap.ui.modifier.arrowheadpathoverlay.ArrowheadPathOverlayDelegate
 import land.sungbin.navermap.ui.modifier.arrowheadpathoverlay.RealArrowheadPathOverlayDelegate
 
-public val LocalArrowheadPathOverlayDelegater:
+public val LocalArrowheadPathOverlayDelegator:
   ProvidableCompositionLocal<ArrowheadPathOverlayDelegate> = staticCompositionLocalOf {
     RealArrowheadPathOverlayDelegate
   }
