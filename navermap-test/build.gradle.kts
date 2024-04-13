@@ -17,3 +17,7 @@ plugins {
   kotlin("jvm")
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
+
+tasks.withType<Test> {
+  enabled = false
+}

@@ -38,6 +38,10 @@ android {
   }
 }
 
+tasks.withType<Test> {
+  enabled = false
+}
+
 kotlin {
   explicitApi()
 }

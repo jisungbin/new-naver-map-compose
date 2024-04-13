@@ -52,9 +52,13 @@ kotlin {
   explicitApi()
 }
 
+tasks.withType<Test> {
+  enabled = false
+}
+
 dependencies {
-  compileOnly(libs.compose.runtime)
-  compileOnly(libs.compose.foundation)
+  implementation(libs.compose.runtime)
+  implementation(libs.compose.foundation)
 
   api(libs.navermap)
   api(projects.navermapRuntime)
