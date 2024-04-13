@@ -36,7 +36,7 @@ internal fun ktModifierNode(method: OverlayClass.Method, context: GeneratorConte
 
   return TypeSpec.classBuilder(context.normalizeName(method.name, NameFlag.MODIFIER_NODE))
     .apply {
-      addAnnotation(IMMUTABLE)
+      addAnnotation(STABLE)
       addModifiers(KModifier.PRIVATE, KModifier.DATA)
       addSuperinterface(modifierClazz)
       primaryConstructor(
@@ -106,6 +106,7 @@ internal fun ktModifierExtension(method: OverlayClass.Method, context: Generator
   return ktFun(context.normalizeName(method.name, NameFlag.MODIFIER_EXTENSION)) {
     addAnnotation(STABLE)
     if (method.deprecated) addAnnotation(deprecated())
+    addKdoc("See [official·document](${method.javadocLink})")
     receiver(modifierClazz)
     method.parameters.forEach { (name, type) -> addParameter(name, type) }
     returns(modifierClazz)

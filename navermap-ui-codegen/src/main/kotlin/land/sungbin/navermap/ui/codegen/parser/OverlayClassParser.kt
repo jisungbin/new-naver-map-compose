@@ -93,18 +93,37 @@ private object TypeNameStringAdapter : TypeAdapter<TypeName>() {
   }
 }
 
+private object ClassNameStringAdapter : TypeAdapter<ClassName>() {
+  override fun write(writer: JsonWriter, value: ClassName?) {
+    if (value != null) {
+      writer.value(value.canonicalName + if (value.isNullable) "?" else "")
+    } else {
+      writer.nullValue()
+    }
+  }
+
+  override fun read(reader: JsonReader): ClassName? {
+    if (reader.peek() == JsonToken.NULL) {
+      reader.nextNull()
+      return null
+    }
+    return ClassName.bestGuess(reader.nextString())
+  }
+}
+
 private val GSON = GsonBuilder()
   .setPrettyPrinting()
+  .registerTypeAdapter(ClassName::class.java, ClassNameStringAdapter)
   .registerTypeAdapter(TypeName::class.java, TypeNameStringAdapter)
   .create()
 
 fun main() {
-  print(GSON.toJson(findOverlayBaseMethods()))
   print(GSON.toJson(findAllOverlayClasses()))
 }
 
 data class OverlayClass(
   val name: ClassName,
+  val constructors: List<Method>,
   val setters: List<Method>,
 ) {
   data class Method(
@@ -113,30 +132,6 @@ data class OverlayClass(
     val deprecated: Boolean,
     val javadocLink: String,
   )
-}
-
-fun findOverlayBaseMethods(): List<OverlayClass.Method> {
-  val scanResult: ScanResult
-  val overlay = ClassGraph()
-    .enableMethodInfo()
-    .enableAnnotationInfo()
-    .acceptPackages(Overlay::class.java.packageName)
-    .scan().also { scanResult = it }
-    .getClassInfo(Overlay::class.java.name)
-
-  val methods = overlay.methodInfo
-    .filter { it.isSetter() }
-    .map { method ->
-      OverlayClass.Method(
-        name = method.name,
-        parameters = method.parameters().toList(),
-        deprecated = method.hasAnnotation(java.lang.Deprecated::class.java),
-        javadocLink = method.javadocLink(),
-      )
-    }
-
-  scanResult.close()
-  return methods
 }
 
 fun findAllOverlayClasses(): List<OverlayClass> {
@@ -150,10 +145,19 @@ fun findAllOverlayClasses(): List<OverlayClass> {
     .filterNot { it.isAbstract }
 
   val founds = overlayClasses.map { clazz ->
+    val constructors = clazz.constructorInfo
     val setters = clazz.methodInfo.filter { it.isSetter() }
 
     OverlayClass(
       name = ClassName(clazz.packageName, clazz.simpleName),
+      constructors = constructors.map { constructor ->
+        OverlayClass.Method(
+          name = "<init>",
+          parameters = constructor.parameters().toList(),
+          deprecated = constructor.hasAnnotation(java.lang.Deprecated::class.java),
+          javadocLink = constructor.javadocLink(constructor = true),
+        )
+      },
       setters = setters.map { method ->
         OverlayClass.Method(
           name = method.name,
@@ -187,9 +191,10 @@ private fun MethodInfo.parameters(): Map<String, TypeName> {
 // https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Marker.html#setCaptionAligns(com.naver.maps.map.overlay.Align...)
 // https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/InfoWindow.html#open(com.naver.maps.map.overlay.Marker,com.naver.maps.map.overlay.Align)
 // https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setCoords(java.util.List)
-private fun MethodInfo.javadocLink() = buildString {
+private fun MethodInfo.javadocLink(constructor: Boolean = false) = buildString {
   append("https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/")
   append("${classInfo.simpleName}.html")
+  if (constructor) return@buildString
   append("#$name")
   append(
     parameterInfo.joinToString(separator = ",", prefix = "(", postfix = ")") { param ->

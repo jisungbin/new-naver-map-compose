@@ -21,9 +21,11 @@ import land.sungbin.navermap.ui.codegen.parser.findAllOverlayClasses
 import java.nio.file.Paths
 import java.util.logging.Logger
 
-private const val BASE_PACKAGE_NAME = "land.sungbin.navermap.ui.modifier"
+private const val BASE_UI_PACKAGE = "land.sungbin.navermap.ui"
+private const val BASE_MODIFIER_PACKAGE = "land.sungbin.navermap.ui.modifier"
 
 private val rootPath by lazy { System.getProperty("user.dir") }
+private val uiModulePath by lazy { "$rootPath/navermap-ui/src/main/kotlin/" }
 private val modifierModulePath by lazy { "$rootPath/navermap-ui-modifier/src/main/kotlin/" }
 
 internal val logger by lazy { Logger.getLogger("ModifierGen") }
@@ -64,18 +66,28 @@ fun main() = findAllOverlayClasses().forEach { overlayClass ->
 
   val compositionLocal = ktCompositionLocal(context)
   val compositionLocalFile =
-    FileSpec.builder("$BASE_PACKAGE_NAME.delegator", compositionLocal.name)
+    FileSpec.builder("$BASE_MODIFIER_PACKAGE.delegator", compositionLocal.name)
       .addProperty(compositionLocal)
       .build()
 
-  val path = Paths.get(modifierModulePath)
-  println("delegate file saved at ${delegateFile.writeTo(path).toString().removePrefix(modifierModulePath)}")
-  println("modifier file saved at ${modifierFile.writeTo(path).toString().removePrefix(modifierModulePath)}")
+  val composableContentFile = ktContentComposable(
+    contentPkg = "$BASE_UI_PACKAGE.content",
+    compositionLocalPkg = compositionLocalFile.packageName,
+    delegatorPkg = modifierFile.packageName,
+    context = context,
+  )
+
+  val uiPath = Paths.get(uiModulePath)
+  val modifierPath = Paths.get(modifierModulePath)
+
+  println("delegate file saved at ${delegateFile.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
+  println("modifier file saved at ${modifierFile.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
   contributorNodeFiles.forEach { file ->
-    println("[${file.name}] modifier file saved at ${file.writeTo(path).toString().removePrefix(modifierModulePath)}")
+    println("[${file.name}] modifier file saved at ${file.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
   }
-  println("composition local file saved at ${compositionLocalFile.writeTo(path).toString().removePrefix(modifierModulePath)}")
+  println("composition local file saved at ${compositionLocalFile.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
+  println("composable content file saved at ${composableContentFile.writeTo(uiPath).toString().removePrefix(uiModulePath)}")
   println("\n")
 }
 
-private fun packageName(name: String) = "$BASE_PACKAGE_NAME.$name"
+private fun packageName(name: String) = "$BASE_MODIFIER_PACKAGE.$name"

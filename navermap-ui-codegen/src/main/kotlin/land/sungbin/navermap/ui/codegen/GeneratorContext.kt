@@ -32,24 +32,26 @@ internal sealed interface NameFlag {
   data object MODIFIER : NameFlag, NoName
   data object MODIFIER_NODE : NameFlag
   data object MODIFIER_EXTENSION : NameFlag
+  data object MAP_MODIFIER_MAPPER : NameFlag, NoName
   data object CONTRIBUTOR : NameFlag
   data object CONTRIBUTION_NODE : NameFlag
   data object COMPOSITION_LOCAL : NameFlag, NoName
+  data object CONTENT_COMPOSABLE_FILE : NameFlag, NoName
 }
 
 internal class GeneratorContext(
   val packageName: String,
   val overlayClass: ClassName,
+  val constructors: List<OverlayClass.Method>,
   val overlayMethods: List<OverlayClass.Method>,
 ) {
-  constructor(
-    packageName: String,
-    overlayResult: OverlayClass,
-  ) : this(
-    packageName = packageName,
-    overlayClass = overlayResult.name,
-    overlayMethods = overlayResult.setters,
-  )
+  constructor(packageName: String, overlayResult: OverlayClass) :
+    this(
+      packageName = packageName,
+      overlayClass = overlayResult.name,
+      constructors = overlayResult.constructors,
+      overlayMethods = overlayResult.setters,
+    )
 
   fun name(flag: NameFlag.NoName): String {
     require(flag is NameFlag)
@@ -64,10 +66,12 @@ internal class GeneratorContext(
       NameFlag.COMBINED -> "Combined${overlayClass.simpleName}Modifier" // CombinedOverlayModifier
       NameFlag.MODIFIER -> "${overlayClass.simpleName}Modifier" // OverlayModifier
       NameFlag.MODIFIER_NODE -> "${overlayClass.simpleName}${name.normalizeUppercase()}ModifierNode" // MarkerLatLngModifierNode
+      NameFlag.MAP_MODIFIER_MAPPER -> "toMapModifier"
       NameFlag.MODIFIER_EXTENSION -> name.normalizeLowercase() // MarkerModifier.[offset]
       NameFlag.CONTRIBUTOR -> "${overlayClass.simpleName}${name.normalizeUppercase()}Contributor" // MarkerLatLngContributor
       NameFlag.CONTRIBUTION_NODE -> "${overlayClass.simpleName}${name.normalizeUppercase()}ContributionNode" // MarkerLatLngContributionNode
       NameFlag.COMPOSITION_LOCAL -> "Local${overlayClass.simpleName}Delegator" // LocalMarkerDelegator
+      NameFlag.CONTENT_COMPOSABLE_FILE -> "NaverMap${overlayClass.simpleName}" // NaverMapMarker
     }
 
   fun noopDelegator() = buildCodeBlock {

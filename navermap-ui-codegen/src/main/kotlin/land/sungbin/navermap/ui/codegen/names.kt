@@ -16,7 +16,7 @@
 
 package land.sungbin.navermap.ui.codegen
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.Stable
 import com.squareup.kotlinpoet.ANY
@@ -25,12 +25,18 @@ import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.MemberName.Companion.member
 import com.squareup.kotlinpoet.UNIT
 import com.squareup.kotlinpoet.asClassName
+import land.sungbin.navermap.runtime.MapApplier
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors
 import land.sungbin.navermap.runtime.contributor.OverlayContributor
+import land.sungbin.navermap.runtime.delegate.OverlayDelegator
+import land.sungbin.navermap.runtime.modifier.MapModifier
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
+import land.sungbin.navermap.runtime.node.DelegatedNaverMap
 import land.sungbin.navermap.runtime.node.DelegatedOverlay
+import land.sungbin.navermap.runtime.node.OverlayNode
+import land.sungbin.navermap.ui.NaverMapContent
 
 internal val ANY_NULLABLE = ANY.copy(nullable = true)
 internal val LAMBDA_UNIT_NULLABLE =
@@ -40,21 +46,27 @@ internal val LAMBDA_UNIT_NULLABLE =
     returnType = UNIT,
   ).copy(nullable = true)
 
+internal val MAP_MODIFIER = MapModifier::class.asClassName()
+internal val NAVER_MAP_CONTENT = NaverMapContent::class.asClassName()
+
 internal val MAP_MODIFIER_CONTRIBUTION_NODE = MapModifierContributionNode::class.asClassName()
 internal val MAP_MODIFIER_CONTRIBUTION_NODE_NULLABLE = MAP_MODIFIER_CONTRIBUTION_NODE.copy(nullable = true)
 
-internal val CONTRIBUTOR = Contributor::class.asClassName()
+internal val OVERLAY_DELEGATOR = OverlayDelegator::class.asClassName()
 internal val OVERLAY_CONTRIBUTOR = OverlayContributor::class.asClassName()
+internal val DELEGATED_OVERLAY = DelegatedOverlay::class.asClassName()
+internal val DELEGATED_NAVER_MAP_NULLABLE = DelegatedNaverMap::class.asClassName().copy(nullable = true)
 
+internal val CONTRIBUTOR = Contributor::class.asClassName()
 internal val CONTRIBUTORS = Contributors::class.asClassName()
 internal val CONTRIBUTORS_OVERLAY = CONTRIBUTORS.member("Overlay")
-
 internal val CONTRIBUTION_KIND = ContributionKind::class.asClassName()
 
-internal val DELEGATED_OVERLAY = DelegatedOverlay::class.asClassName()
-
+internal val COMPOSABLE = Composable::class.asClassName()
 internal val STABLE = Stable::class.asClassName()
-internal val IMMUTABLE = Immutable::class.asClassName()
+internal val COMPOSE_NODE = ClassName("androidx.compose.runtime", "ComposeNode")
+internal val OVERLAY_NODE = OverlayNode::class.asClassName()
+internal val MAP_APPLIER = MapApplier::class.asClassName()
 
 internal val PROVIDABLE_COMPOSITION_LOCAL = ProvidableCompositionLocal::class.asClassName()
 internal val COMPOSITION_LOCAL_OF = ClassName("androidx.compose.runtime", "staticCompositionLocalOf")

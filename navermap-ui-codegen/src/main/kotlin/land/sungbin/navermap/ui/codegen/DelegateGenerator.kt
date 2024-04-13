@@ -59,13 +59,11 @@ internal fun ktRealDelegate(context: GeneratorContext): TypeSpec {
       addSuperinterface(delegatorClazz)
       context.overlayMethods.forEach { method ->
         val methodFun = ktFun(method.name) {
-          val suppression = arrayListOf<String>()
           if (method.parameters.any { (_, type) -> type is ParameterizedTypeName }) {
-            suppression += "CANNOT_CHECK_FOR_ERASED"
+            addAnnotation(suppress("CANNOT_CHECK_FOR_ERASED"))
           }
-          if (method.deprecated) suppression += "DEPRECATION"
-          if (suppression.isNotEmpty()) {
-            addAnnotation(suppress(*suppression.toTypedArray()))
+          if (method.deprecated) {
+            addAnnotation(suppress("DEPRECATION"))
           }
           addModifiers(KModifier.OVERRIDE)
           addParameter("instance", DELEGATED_OVERLAY)
