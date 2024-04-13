@@ -17,6 +17,7 @@
 package land.sungbin.navermap.sample
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -25,14 +26,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.naver.maps.geometry.LatLng
+import kotlinx.coroutines.delay
+import land.sungbin.navermap.ui.Marker
 import land.sungbin.navermap.ui.NaverMap
+import land.sungbin.navermap.ui.modifier.marker.MarkerModifier
+import land.sungbin.navermap.ui.modifier.marker.captionText
+import land.sungbin.navermap.ui.modifier.marker.captionTextSize
+import land.sungbin.navermap.ui.modifier.marker.onClickListener
 
 class SampleActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +59,28 @@ class SampleActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize(0.5f),
           visible = showMap,
         ) {
-          NaverMap(modifier = Modifier.fillMaxSize())
+          NaverMap(modifier = Modifier.fillMaxSize()) {
+            var now by remember { mutableLongStateOf(now) }
+
+            LaunchedEffect(Unit) {
+              while (true) {
+                now = System.currentTimeMillis()
+                delay(1000)
+              }
+            }
+
+            Marker(
+              modifier = MarkerModifier
+                .onClickListener {
+                  Toast
+                    .makeText(this@SampleActivity, "Marker Clicked at $now", Toast.LENGTH_SHORT)
+                    .show()
+                  true
+                }
+                .captionText("Current time is $now"),
+              position = LatLng(37.5670135, 126.9783740),
+            )
+          }
         }
         Button(onClick = { showMap = !showMap }) {
           Text(text = if (showMap) "Hide Map" else "Show Map")
@@ -58,3 +89,5 @@ class SampleActivity : ComponentActivity() {
     }
   }
 }
+
+private val now get() = System.currentTimeMillis()
