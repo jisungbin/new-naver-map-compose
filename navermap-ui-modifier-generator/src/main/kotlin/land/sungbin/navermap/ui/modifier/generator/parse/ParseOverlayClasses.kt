@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.ui.modifier.generator
+package land.sungbin.navermap.ui.modifier.generator.parse
 
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
@@ -22,7 +22,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import com.naver.maps.map.overlay.Overlay
-import com.squareup.kotlinpoet.ARRAY
+import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.BYTE
 import com.squareup.kotlinpoet.CHAR
@@ -30,9 +30,15 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
 import com.squareup.kotlinpoet.FLOAT
 import com.squareup.kotlinpoet.INT
+import com.squareup.kotlinpoet.LIST
 import com.squareup.kotlinpoet.LONG
+import com.squareup.kotlinpoet.ParameterizedTypeName
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.SHORT
+import com.squareup.kotlinpoet.STRING
+import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.UNIT
+import com.squareup.kotlinpoet.asTypeName
 import io.github.classgraph.ArrayTypeSignature
 import io.github.classgraph.BaseTypeSignature
 import io.github.classgraph.ClassGraph
@@ -40,17 +46,37 @@ import io.github.classgraph.ClassRefTypeSignature
 import io.github.classgraph.MethodInfo
 import io.github.classgraph.ScanResult
 import io.github.classgraph.TypeSignature
-import kotlin.reflect.javaType
-import kotlin.reflect.typeOf
+import land.sungbin.navermap.ui.modifier.generator.logger
 
 private val NULLABLE = androidx.annotation.Nullable::class.java
 
-private object ClassNameSimpleTypeAdapter : TypeAdapter<ClassName>() {
-  override fun write(writer: JsonWriter, value: ClassName?) {
-    writer.value(value?.canonicalName + if (value?.isNullable == true) "?" else "")
+private object ClassNameSimpleTypeAdapter : TypeAdapter<TypeName>() {
+  fun ClassName.simpleName() = canonicalName + if (isNullable) "?" else ""
+
+  fun ParameterizedTypeName.simpleName(): String {
+    return rawType.canonicalName + typeArguments.joinToString(prefix = "<", postfix = ">") { type ->
+      when (type) {
+        is ClassName -> type.simpleName()
+        is ParameterizedTypeName -> type.simpleName()
+        else -> error("Unknown type: $type")
+      }
+    }
   }
 
-  override fun read(reader: JsonReader): ClassName? {
+  override fun write(writer: JsonWriter, value: TypeName?) {
+    if (value != null) {
+      val represent = when (value) {
+        is ClassName -> value.simpleName()
+        is ParameterizedTypeName -> value.simpleName()
+        else -> error("Unknown type: $value")
+      }
+      writer.value(represent)
+    } else {
+      writer.nullValue()
+    }
+  }
+
+  override fun read(reader: JsonReader): TypeName? {
     if (reader.peek() == JsonToken.NULL) {
       reader.nextNull()
       return null
@@ -59,15 +85,14 @@ private object ClassNameSimpleTypeAdapter : TypeAdapter<ClassName>() {
   }
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 private val GSON = GsonBuilder()
   .setPrettyPrinting()
-  .registerTypeAdapter(typeOf<ClassName>().javaType, ClassNameSimpleTypeAdapter)
+  .registerTypeAdapter(TypeName::class.java, ClassNameSimpleTypeAdapter)
   .create()
 
 fun main() {
-  print(GSON.toJson(findOverlayBaseMethods()))
-  print(GSON.toJson(findAllOverlayClasses()))
+  // print(GSON.toJson(findOverlayBaseMethods()))
+  /*print(GSON.toJson(*/findAllOverlayClasses()/*))*/
 }
 
 data class OverlayClass(
@@ -76,7 +101,7 @@ data class OverlayClass(
 ) {
   data class Method(
     val name: String,
-    val parameters: List<Pair<String, ClassName>>,
+    val parameters: List<Pair<String, TypeName>>,
     val javadocLink: String,
   )
 }
@@ -136,23 +161,14 @@ fun findAllOverlayClasses(): List<OverlayClass> {
 private fun MethodInfo.isSetter(): Boolean =
   name.startsWith("set") && (typeDescriptor.resultType as? BaseTypeSignature)?.type === Void.TYPE
 
-private fun MethodInfo.parameters(): Map<String, ClassName> {
+private fun MethodInfo.parameters(): Map<String, TypeName> {
   // TODO: https://discuss.gradle.org/t/how-to-pass-parameters-option-to-javac-compiler-when-building-my-java-project-with-gradle/2106
   //  Add the `-parameters` argument to javac. I've tried everything, but strangely it doesn't
   //  work in my Android build environment. It works fine in pure Java projects!
   var argIndex = 0
   return parameterInfo.associate { param ->
     val nullable = param.hasAnnotation(NULLABLE)
-    val type = when (val type = param.typeDescriptor) {
-      is ArrayTypeSignature -> {
-        type.arrayClassInfo.loadClass().primitiveClassNameOrNull()
-          ?: ClassName.bestGuess(type.arrayClassInfo.name.removeSuffix("[]"))
-      }
-      is ClassRefTypeSignature -> ClassName.bestGuess(type.fqn())
-      is BaseTypeSignature -> type.type.primitiveClassNameOrNull()!!
-      else -> error("Unknown type: $type")
-    }
-    "arg${argIndex++}" to type.copy(nullable = nullable) as ClassName
+    "arg${argIndex++}" to param.typeDescriptor.typed().copy(nullable = nullable)
   }
 }
 
@@ -164,26 +180,70 @@ private fun MethodInfo.javadocLink() = buildString {
   append("https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/")
   append("${classInfo.simpleName}.html")
   append("#$name")
-  append(parameterInfo.joinToString(separator = ",", prefix = "(", postfix = ")") { param -> param.typeDescriptor.fqn() })
+  append(
+    parameterInfo.joinToString(separator = ",", prefix = "(", postfix = ")") { param ->
+      param.typeDescriptor.fqn(varargVisualizing = true)
+    },
+  )
 }
 
-private fun TypeSignature.fqn() = when (this) {
-  is ArrayTypeSignature -> arrayClassInfo.name.let { if (it.endsWith("[]")) it.removeSuffix("[]") + "..." else it }
+private fun ClassName.useKoltinCollections() = if (this.canonicalName == "java.util.List") LIST else this
+
+private fun TypeSignature.fqn(varargVisualizing: Boolean = false) = when (this) {
+  is ArrayTypeSignature -> arrayClassInfo.name.let {
+    if (it.endsWith("[]")) it.removeSuffix("[]") + (if (varargVisualizing) "..." else "")
+    else it
+  }
   is ClassRefTypeSignature -> fullyQualifiedClassName.replace('$', '.')
   is BaseTypeSignature -> typeStr
   else -> error("Unknown type: $this")
 }
 
-private fun Class<*>.primitiveClassNameOrNull() = when {
-  this === Void.TYPE -> UNIT
-  this === Boolean::class.javaPrimitiveType -> BOOLEAN
-  this === Byte::class.javaPrimitiveType -> BYTE
-  this === Short::class.javaPrimitiveType -> SHORT
-  this === Int::class.javaPrimitiveType -> INT
-  this === Long::class.javaPrimitiveType -> LONG
-  this === Char::class.javaPrimitiveType -> CHAR
-  this === Float::class.javaPrimitiveType -> FLOAT
-  this === Double::class.javaPrimitiveType -> DOUBLE
-  isArray -> ARRAY
-  else -> null
+private fun String.typed(): ClassName =
+  when {
+    this == Void.TYPE.canonicalName -> UNIT
+    this == Boolean::class.javaPrimitiveType!!.canonicalName -> BOOLEAN
+    this == Byte::class.javaPrimitiveType!!.canonicalName -> BYTE
+    this == Short::class.javaPrimitiveType!!.canonicalName -> SHORT
+    this == Int::class.javaPrimitiveType!!.canonicalName -> INT
+    this == Long::class.javaPrimitiveType!!.canonicalName -> LONG
+    this == Char::class.javaPrimitiveType!!.canonicalName -> CHAR
+    this == Float::class.javaPrimitiveType!!.canonicalName -> FLOAT
+    this == Double::class.javaPrimitiveType!!.canonicalName -> DOUBLE
+    else -> ClassName.bestGuess(this)
+  }
+
+private fun TypeSignature.typed(): TypeName = when (this) {
+  is ArrayTypeSignature -> recursiveTyped().also {
+    logger.warning(
+      "An ArrayTypeSignature was found! You probably need to manually fix the type. " +
+        "[${toStringWithSimpleNames()}]",
+    )
+  }
+  is ClassRefTypeSignature -> (loadClass().asTypeName() as ClassName).useKotlinPrimitiveType()
+  is BaseTypeSignature -> type.asTypeName()
+  else -> error("Unknown type: $this")
 }
+
+// @Experimental
+private fun ArrayTypeSignature.recursiveTyped(): TypeName {
+  var current: TypeSignature = this
+  val types = mutableListOf<ClassName>()
+  while (current is ArrayTypeSignature) {
+    types += current.arrayClassInfo.name.removeSuffix("[]").typed().useKoltinCollections()
+    current = current.nestedType
+  }
+  types += current.typed() as ClassName
+  return if (types.size > 1) types.dropLast(1).foldRight(types.last() as TypeName) { type, acc ->
+    type.parameterizedBy(acc)
+  } else types.first()
+}
+
+// Only java.util.List, java.lang.String, java.lang.String.
+// We should also handle the java.util.List of ParameterizedTypeName, but due to its complexity, we do it manually.
+private fun ClassName.useKotlinPrimitiveType(): ClassName =
+  when (canonicalName) {
+    "java.lang.String" -> STRING
+    "java.lang.Object" -> ANY
+    else -> this
+  }

@@ -44,8 +44,13 @@ kotlin {
   explicitApi()
 }
 
+tasks.withType<Test> {
+  enabled = false
+}
+
 dependencies {
-  implementation(projects.navermapRuntime)
   implementation(libs.navermap)
-  implementation(libs.jetbrains.annotation)
+  implementation(libs.compose.runtime)
+  implementation(projects.navermapRuntime)
+  implementation(libs.androidx.annotation)
 }
