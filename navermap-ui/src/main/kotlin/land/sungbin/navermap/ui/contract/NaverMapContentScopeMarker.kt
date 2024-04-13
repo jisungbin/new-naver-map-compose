@@ -14,19 +14,9 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.ui
+package land.sungbin.navermap.ui.contract
 
-import androidx.compose.runtime.Composable
-import com.naver.maps.map.overlay.Overlay
-import land.sungbin.navermap.runtime.modifier.MapModifier
-import land.sungbin.navermap.token.OverlayFactory
-
-internal data object NaverMapContentScopeInstance : NaverMapContentScope {
-  @Composable
-  override fun <O, T : OverlayFactory<O>> T.invoke(
-    modifier: MapModifier,
-    block: O.() -> Unit,
-  ) where O : Overlay {
-    TODO("Not yet implemented")
-  }
-}
+@DslMarker
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.SOURCE)
+public annotation class NaverMapContentScopeMarker

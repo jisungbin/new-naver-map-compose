@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.ui
+package land.sungbin.navermap.ui.contract
 
-@DslMarker
-@Target(AnnotationTarget.CLASS)
-@Retention(AnnotationRetention.SOURCE)
-public annotation class NaverMapContentScopeMarker
+import androidx.compose.runtime.ComposableTargetMarker
+
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.TYPE)
+@ComposableTargetMarker(description = "NaverMap content Composable")
+public annotation class NaverMapContentComposable

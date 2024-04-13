@@ -48,16 +48,17 @@ import land.sungbin.navermap.runtime.modifier.MapModifier
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.runtime.node.DelegatedMapView
 import land.sungbin.navermap.runtime.node.LayoutNode
+import land.sungbin.navermap.ui.contract.NaverMapContentComposable
 import land.sungbin.navermap.ui.contributor.mapLifecycle
 import com.naver.maps.map.R as NaverMapR
 
-private val NoContent: @[Composable NaverMapContentComposable] NaverMapContentScope.() -> Unit = {}
+private val NoContent: @[Composable NaverMapContentComposable] () -> Unit = {}
 
 @Composable
 public fun NaverMap(
   modifier: Modifier = Modifier,
   mapContentModifier: MapModifier = MapModifier,
-  mapContent: @[Composable NaverMapContentComposable] NaverMapContentScope.() -> Unit = NoContent,
+  mapContent: @[Composable NaverMapContentComposable] () -> Unit = NoContent,
 ) {
   val context = LocalContext.current
   var map by remember { mutableStateOf<MapView?>(null) }
@@ -101,9 +102,8 @@ public fun NaverMap(
         update = {
           update(mapContentModifier) { this.modifier = mapLayoutModifier then mapContentModifier }
         },
-      ) {
-        NaverMapContentScopeInstance.mapContent()
-      }
+        content = mapContent,
+      )
     }
   }
 
@@ -131,7 +131,7 @@ private class MapViewInstanceInterceptorNode(
     }
   }
 
-  override fun onDetach(instacne: Contributor) {
+  override fun onDetach(instance: Contributor) {
     onReady = null
   }
 
