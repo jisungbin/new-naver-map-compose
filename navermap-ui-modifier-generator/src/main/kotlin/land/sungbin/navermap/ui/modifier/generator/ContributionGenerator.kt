@@ -21,7 +21,7 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.TypeSpec
-import land.sungbin.navermap.ui.modifier.generator.parse.OverlayClass
+import land.sungbin.navermap.ui.modifier.generator.parser.OverlayClass
 
 internal fun ktContributionNode(method: OverlayClass.Method, context: GeneratorContext): TypeSpec {
   val delegatorClazz = ClassName(context.packageName, context.name(NameFlag.DELEGATE))

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.ui.modifier.generator.parse
+package land.sungbin.navermap.ui.modifier.generator.parser
 
 import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
@@ -50,7 +50,7 @@ import land.sungbin.navermap.ui.modifier.generator.logger
 
 private val NULLABLE = androidx.annotation.Nullable::class.java
 
-private object ClassNameSimpleTypeAdapter : TypeAdapter<TypeName>() {
+private object TypeNameStringAdapter : TypeAdapter<TypeName>() {
   fun ClassName.simpleName() = canonicalName + if (isNullable) "?" else ""
 
   fun ParameterizedTypeName.simpleName(): String {
@@ -87,12 +87,12 @@ private object ClassNameSimpleTypeAdapter : TypeAdapter<TypeName>() {
 
 private val GSON = GsonBuilder()
   .setPrettyPrinting()
-  .registerTypeAdapter(TypeName::class.java, ClassNameSimpleTypeAdapter)
+  .registerTypeAdapter(TypeName::class.java, TypeNameStringAdapter)
   .create()
 
 fun main() {
-  // print(GSON.toJson(findOverlayBaseMethods()))
-  /*print(GSON.toJson(*/findAllOverlayClasses()/*))*/
+  print(GSON.toJson(findOverlayBaseMethods()))
+  print(GSON.toJson(findAllOverlayClasses()))
 }
 
 data class OverlayClass(

@@ -24,7 +24,7 @@ import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
-import land.sungbin.navermap.ui.modifier.generator.parse.OverlayClass
+import land.sungbin.navermap.ui.modifier.generator.parser.OverlayClass
 
 // TODO: We need to create an instance of OverlayModifierNode and MapModifierNode
 //  each time we want to use OverlayModifier. We need to think about how to minimize

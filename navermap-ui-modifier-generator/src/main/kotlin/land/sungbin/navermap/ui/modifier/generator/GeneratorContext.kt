@@ -19,7 +19,7 @@ package land.sungbin.navermap.ui.modifier.generator
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName.Companion.member
 import com.squareup.kotlinpoet.buildCodeBlock
-import land.sungbin.navermap.ui.modifier.generator.parse.OverlayClass
+import land.sungbin.navermap.ui.modifier.generator.parser.OverlayClass
 
 @Suppress("ClassName")
 internal sealed interface NameFlag {

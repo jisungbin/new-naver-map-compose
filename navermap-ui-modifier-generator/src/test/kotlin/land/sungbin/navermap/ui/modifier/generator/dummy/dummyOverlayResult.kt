@@ -17,7 +17,7 @@
 package land.sungbin.navermap.ui.modifier.generator.dummy
 
 import com.squareup.kotlinpoet.ClassName
-import land.sungbin.navermap.ui.modifier.generator.parse.OverlayClass
+import land.sungbin.navermap.ui.modifier.generator.parser.OverlayClass
 
 val dummyOverlayResult = OverlayClass(
   name = ClassName("my.map.service", "Marker"),

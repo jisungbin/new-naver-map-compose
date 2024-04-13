@@ -17,7 +17,7 @@
 package land.sungbin.navermap.ui.modifier.generator
 
 import com.squareup.kotlinpoet.FileSpec
-import land.sungbin.navermap.ui.modifier.generator.parse.findAllOverlayClasses
+import land.sungbin.navermap.ui.modifier.generator.parser.findAllOverlayClasses
 import java.nio.file.Paths
 import java.util.logging.Logger
 
