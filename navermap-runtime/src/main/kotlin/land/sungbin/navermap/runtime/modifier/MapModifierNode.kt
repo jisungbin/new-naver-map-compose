@@ -20,8 +20,8 @@ import androidx.compose.runtime.Stable
 
 @Stable
 public interface MapModifierNode<T> : MapModifier {
-  public fun onAttach(instacne: T) {}
-  public fun onDetach(instacne: T) {}
+  public fun onAttach(instance: T) {}
+  public fun onDetach(instance: T) {}
 
   override fun <R> foldIn(initial: R, operation: (R, MapModifierNode<*>) -> R): R =
     operation(initial, this)

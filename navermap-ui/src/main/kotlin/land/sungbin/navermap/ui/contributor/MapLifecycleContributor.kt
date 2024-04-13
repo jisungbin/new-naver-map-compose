@@ -71,10 +71,10 @@ private data class MapLifecycleContributionNode(
     contributor.savedInstanceState = savedInstanceState
   }
 
-  override fun onDetach(instacne: Contributor) {
-    if (instacne !is MapLifecycleContributor) error("Invalid contributor type: $instacne")
-    instacne.mapViewClear?.invoke()
-    instacne.mapViewClear = null
+  override fun onDetach(instance: Contributor) {
+    if (instance !is MapLifecycleContributor) error("Invalid contributor type: $instance")
+    instance.mapViewClear?.invoke()
+    instance.mapViewClear = null
   }
 }
 

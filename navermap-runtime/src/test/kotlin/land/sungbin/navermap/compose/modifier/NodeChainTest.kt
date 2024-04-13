@@ -1053,12 +1053,12 @@ private abstract class TestBaseContributionNode : ContributionNode {
     updater?.update(contributor)
   }
 
-  override fun onAttach(instacne: Contributor) {
-    attacher?.attach(instacne)
+  override fun onAttach(instance: Contributor) {
+    attacher?.attach(instance)
   }
 
-  override fun onDetach(instacne: Contributor) {
-    detacher?.detach(instacne)
+  override fun onDetach(instance: Contributor) {
+    detacher?.detach(instance)
   }
 
   override fun hashCode(): Int = System.identityHashCode(this)
