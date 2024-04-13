@@ -20,9 +20,6 @@ package land.sungbin.navermap.ui.modifier.circleoverlay
 
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.NaverMap
-import kotlin.Any
-import kotlin.Suppress
-import kotlin.Unit
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay

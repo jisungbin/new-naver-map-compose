@@ -43,7 +43,7 @@ class ContentComposableGeneratorRuntimeTime {
       overlayResult = dummyOverlayResult,
     )
     dummyOverlayResult.constructors.forEach {
-      println(ktContentConstructor(context.overlayClass, it))
+      println(ktContentConstructor(context.clazz, it))
     }
   }
 
@@ -53,7 +53,7 @@ class ContentComposableGeneratorRuntimeTime {
       overlayResult = dummyOverlayResult,
     )
     dummyOverlayResult.constructors.forEach {
-      println(ktOverlayDelegatorObject(context.overlayClass, it))
+      println(ktOverlayDelegatorObject(context.clazz, it))
     }
   }
 

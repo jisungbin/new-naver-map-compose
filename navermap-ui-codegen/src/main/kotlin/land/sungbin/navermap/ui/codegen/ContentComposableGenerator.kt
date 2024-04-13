@@ -27,7 +27,7 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.buildCodeBlock
 import com.squareup.kotlinpoet.withIndent
-import land.sungbin.navermap.ui.codegen.parser.OverlayClass
+import land.sungbin.navermap.ui.codegen.parser.NaverMapClass
 
 internal fun ktContentComposable(
   contentPkg: String,
@@ -53,12 +53,12 @@ internal fun ktComposableContent(
   context: GeneratorContext,
   compositionLocalPkg: String,
   delegatorPkg: String,
-  constructor: OverlayClass.Method,
+  constructor: NaverMapClass.Method,
 ): FunSpec {
   val modifierClazz = ClassName(context.packageName, context.name(NameFlag.MODIFIER))
   val delegator = ktDelegator(compositionLocalPkg, delegatorPkg, context)
 
-  return ktFun(context.overlayClass.simpleName) {
+  return ktFun(context.clazz.simpleName) {
     addAnnotation(COMPOSABLE)
     addAnnotation(suppress("UnusedReceiverParameter"))
     if (constructor.deprecated) addAnnotation(deprecated())
@@ -74,7 +74,7 @@ internal fun ktComposableContent(
       buildCodeBlock {
         add("%L", delegator)
         addStatement("")
-        val overlayDelegator = ktOverlayDelegatorObject(context.overlayClass, constructor)
+        val overlayDelegator = ktOverlayDelegatorObject(context.clazz, constructor)
         val updateBlock = ktComposeNodeUpdate(context)
         add(ktComposeNode(context, factory = CodeBlock.of("%L", overlayDelegator), update = updateBlock))
       },
@@ -122,7 +122,7 @@ internal fun ktComposeNode(
 }
 
 @VisibleForTesting
-internal fun ktOverlayDelegatorObject(clazz: ClassName, constructor: OverlayClass.Method): TypeSpec =
+internal fun ktOverlayDelegatorObject(clazz: ClassName, constructor: NaverMapClass.Method): TypeSpec =
   TypeSpec.anonymousClassBuilder()
     .addSuperinterface(OVERLAY_DELEGATOR)
     .addProperty(
@@ -141,7 +141,7 @@ internal fun ktOverlayDelegatorObject(clazz: ClassName, constructor: OverlayClas
     .build()
 
 @VisibleForTesting
-internal fun ktContentConstructor(clazz: ClassName, constructor: OverlayClass.Method): CodeBlock =
+internal fun ktContentConstructor(clazz: ClassName, constructor: NaverMapClass.Method): CodeBlock =
   buildCodeBlock {
     addStatement("%L(", clazz.canonicalName)
     withIndent {

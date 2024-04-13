@@ -36,12 +36,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.NaverMap.MapType
 import kotlinx.coroutines.delay
 import land.sungbin.navermap.ui.NaverMap
 import land.sungbin.navermap.ui.content.Marker
 import land.sungbin.navermap.ui.modifier.marker.MarkerModifier
 import land.sungbin.navermap.ui.modifier.marker.captionText
 import land.sungbin.navermap.ui.modifier.marker.onClickListener
+import land.sungbin.navermap.ui.modifier.navermap.NaverMapModifier
+import land.sungbin.navermap.ui.modifier.navermap.mapType
+import land.sungbin.navermap.ui.modifier.navermap.nightModeEnabled
+import land.sungbin.navermap.ui.modifier.navermap.onMapClickListener
 
 class SampleActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +63,17 @@ class SampleActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize(0.5f),
           visible = showMap,
         ) {
-          NaverMap(modifier = Modifier.fillMaxSize()) {
+          NaverMap(
+            modifier = Modifier.fillMaxSize(),
+            naverMapModifier = NaverMapModifier
+              .mapType(MapType.NaviHybrid)
+              .nightModeEnabled(true)
+              .onMapClickListener { _, latlng ->
+                Toast
+                  .makeText(this@SampleActivity, "Map Clicked at $latlng", Toast.LENGTH_SHORT)
+                  .show()
+              },
+          ) {
             var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
             LaunchedEffect(Unit) {

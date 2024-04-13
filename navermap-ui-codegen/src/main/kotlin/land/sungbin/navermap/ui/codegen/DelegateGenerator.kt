@@ -28,7 +28,7 @@ internal fun ktDelegate(context: GeneratorContext): TypeSpec {
 
   val builder = TypeSpec.interfaceBuilder(myClazz.simpleName)
     .apply {
-      context.overlayMethods.forEach { method ->
+      context.methods.forEach { method ->
         // The default delegate has a `{}` default implementation to make it ready for testing.
         val methodFun = ktFun(method.name) {
           addKdoc("See [official·document](${method.javadocLink})")
@@ -57,7 +57,7 @@ internal fun ktRealDelegate(context: GeneratorContext): TypeSpec {
   return TypeSpec.objectBuilder(context.name(NameFlag.REAL_DELEGATE))
     .apply {
       addSuperinterface(delegatorClazz)
-      context.overlayMethods.forEach { method ->
+      context.methods.forEach { method ->
         val methodFun = ktFun(method.name) {
           if (method.parameters.any { (_, type) -> type is ParameterizedTypeName }) {
             addAnnotation(suppress("CANNOT_CHECK_FOR_ERASED"))
@@ -70,15 +70,21 @@ internal fun ktRealDelegate(context: GeneratorContext): TypeSpec {
           method.parameters.forEach { (name, type) ->
             addParameter(name, if (type.isNullable) ANY_NULLABLE else ANY)
           }
-          addStatement("require(instance·is·%T)", context.overlayClass)
+          addStatement("require(instance·is·%T)", context.clazz)
           method.parameters.forEach { (name, type) ->
             if (type != ANY_NULLABLE) addStatement("require(%L·is·%T)", name, type)
-            val isVararg = (
-              (type is ClassName && type.simpleName.endsWith("Array")) ||
-                (type is ParameterizedTypeName && type.rawType == ARRAY)
-              )
-            addStatement("instance.%L(%L%L)", method.name, if (isVararg) "*" else "", name)
           }
+          addStatement(
+            "instance.%L(%L)",
+            method.name,
+            method.parameters.joinToString { (name, type) ->
+              val isVararg = (
+                (type is ClassName && type.simpleName.endsWith("Array")) ||
+                  (type is ParameterizedTypeName && type.rawType == ARRAY)
+                )
+              (if (isVararg) "*" else "") + name
+            },
+          )
         }
         addFunction(methodFun)
       }

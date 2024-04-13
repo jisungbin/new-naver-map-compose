@@ -17,18 +17,18 @@
 package land.sungbin.navermap.ui.codegen.dummy
 
 import com.squareup.kotlinpoet.ClassName
-import land.sungbin.navermap.ui.codegen.parser.OverlayClass
+import land.sungbin.navermap.ui.codegen.parser.NaverMapClass
 
-val dummyOverlayResult = OverlayClass(
+val dummyOverlayResult = NaverMapClass(
   name = ClassName("my.map.service", "Marker"),
   constructors = listOf(
-    OverlayClass.Method(
+    NaverMapClass.Method(
       name = "",
       parameters = emptyList(),
       deprecated = false,
       javadocLink = "https://my.javadoc.link/constructor",
     ),
-    OverlayClass.Method(
+    NaverMapClass.Method(
       name = "",
       parameters = mapOf(
         "position" to ClassName("my.map.service", "LatLng"),
@@ -37,7 +37,7 @@ val dummyOverlayResult = OverlayClass(
       deprecated = false,
       javadocLink = "https://my.javadoc.link/constructor",
     ),
-    OverlayClass.Method(
+    NaverMapClass.Method(
       name = "",
       parameters = mapOf(
         "position" to ClassName("my.map.service", "LatLng"),
@@ -49,7 +49,7 @@ val dummyOverlayResult = OverlayClass(
     ),
   ),
   setters = listOf(
-    OverlayClass.Method(
+    NaverMapClass.Method(
       name = "position",
       parameters = mapOf(
         "position" to ClassName("my.map.service", "LatLng"),
@@ -60,7 +60,7 @@ val dummyOverlayResult = OverlayClass(
       deprecated = false,
       javadocLink = "https://my.javadoc.link/icon",
     ),
-    OverlayClass.Method(
+    NaverMapClass.Method(
       name = "icon",
       parameters = mapOf(
         "icon" to ClassName("my.icon.service", "Icon").copy(nullable = true) as ClassName,

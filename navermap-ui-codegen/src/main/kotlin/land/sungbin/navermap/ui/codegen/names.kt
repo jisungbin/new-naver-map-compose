@@ -19,6 +19,7 @@ package land.sungbin.navermap.ui.codegen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.Stable
+import com.naver.maps.map.NaverMap
 import com.squareup.kotlinpoet.ANY
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.LambdaTypeName
@@ -47,6 +48,7 @@ internal val LAMBDA_UNIT_NULLABLE =
   ).copy(nullable = true)
 
 internal val MAP_MODIFIER = MapModifier::class.asClassName()
+internal val NAVER_MAP = NaverMap::class.asClassName()
 internal val NAVER_MAP_CONTENT = NaverMapContent::class.asClassName()
 
 internal val MAP_MODIFIER_CONTRIBUTION_NODE = MapModifierContributionNode::class.asClassName()

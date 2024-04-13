@@ -36,6 +36,22 @@ private data class MarkerSubCaptionFontFamilyModifierNode(
 
   override fun <R : Any> fold(initial: R, operation: (R, MarkerModifier) -> R): R =
     operation(initial, this)
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is MarkerSubCaptionFontFamilyModifierNode) return false
+
+    if (!arg0.contentEquals(other.arg0)) return false
+    if (delegator != other.delegator) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = arg0.contentHashCode()
+    result = 31 * result + delegator.hashCode()
+    return result
+  }
 }
 
 @Stable
@@ -51,6 +67,22 @@ private data class MarkerSubCaptionFontFamilyContributionNode(
     require(contributor is MarkerSubCaptionFontFamilyContributor)
     contributor.arg0 = arg0
     contributor.delegate = delegate
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is MarkerSubCaptionFontFamilyContributionNode) return false
+
+    if (!arg0.contentEquals(other.arg0)) return false
+    if (`delegate` != other.`delegate`) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = arg0.contentHashCode()
+    result = 31 * result + `delegate`.hashCode()
+    return result
   }
 }
 

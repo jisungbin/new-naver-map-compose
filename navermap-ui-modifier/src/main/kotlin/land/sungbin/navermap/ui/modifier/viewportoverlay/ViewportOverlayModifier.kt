@@ -17,13 +17,9 @@
 package land.sungbin.navermap.ui.modifier.viewportoverlay
 
 import androidx.compose.runtime.Stable
-import java.lang.System.identityHashCode
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.viewportoverlay.ViewportOverlayDelegate.Companion.NoOp
+import java.lang.System.identityHashCode
 
 public interface ViewportOverlayModifier {
   public var delegator: ViewportOverlayDelegate
@@ -33,7 +29,7 @@ public interface ViewportOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, ViewportOverlayModifier) -> R): R
 
   public infix fun then(other: ViewportOverlayModifier): ViewportOverlayModifier = if
-                                                                                     (other === ViewportOverlayModifier) this else CombinedViewportOverlayModifier(this, other)
+    (other === ViewportOverlayModifier) this else CombinedViewportOverlayModifier(this, other)
 
   public companion object : ViewportOverlayModifier {
     override var delegator: ViewportOverlayDelegate = NoOp

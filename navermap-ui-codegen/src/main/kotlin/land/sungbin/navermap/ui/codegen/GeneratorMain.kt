@@ -18,6 +18,7 @@ package land.sungbin.navermap.ui.codegen
 
 import com.squareup.kotlinpoet.FileSpec
 import land.sungbin.navermap.ui.codegen.parser.findAllOverlayClasses
+import land.sungbin.navermap.ui.codegen.parser.findNaverMapProperties
 import java.nio.file.Paths
 import java.util.logging.Logger
 
@@ -30,14 +31,24 @@ private val modifierModulePath by lazy { "$rootPath/navermap-ui-modifier/src/mai
 
 internal val logger by lazy { Logger.getLogger("ModifierGen") }
 
-fun main() = findAllOverlayClasses().forEach { overlayClass ->
-  val current = overlayClass.name.simpleName
-  val pkg = packageName(current.lowercase())
-  val context = GeneratorContext(pkg, overlayClass)
+fun main() {
+  generateNaverMapClass()
+  generateAllOverlayClasses()
+}
+
+private fun generateNaverMapClass() {
+  val properties = findNaverMapProperties()
+  val pkg = "$BASE_MODIFIER_PACKAGE.navermap"
+  val context = GeneratorContext(
+    packageName = pkg,
+    clazz = NAVER_MAP,
+    constructors = emptyList(),
+    methods = properties,
+  )
 
   val delegate = ktDelegate(context)
   val realDelegate = ktRealDelegate(context)
-  val delegateFile = FileSpec.builder(pkg, delegate.name!!)
+  val delegateFile = FileSpec.builder(context.packageName, delegate.name!!)
     .addTypes(delegate, realDelegate)
     .addAnnotation(suppress("UsePropertyAccessSyntax"))
     .build()
@@ -45,13 +56,13 @@ fun main() = findAllOverlayClasses().forEach { overlayClass ->
   val modifier = ktModifier(context)
   val combinedModifier = ktCombinedModifier(context)
 
-  val modifierNodes = overlayClass.setters.map { method -> ktModifierNode(method, context) }
-  val modifierExtensions = overlayClass.setters.map { method -> ktModifierExtension(method, context) }
-  val contributionNodes = overlayClass.setters.map { method -> ktContributionNode(method, context) }
-  val contributors = overlayClass.setters.map { method -> ktContributor(method, context) }
+  val modifierNodes = properties.map { method -> ktModifierNode(method, context) }
+  val modifierExtensions = properties.map { method -> ktModifierExtension(method, context) }
+  val contributionNodes = properties.map { method -> ktContributionNode(method, context) }
+  val contributors = properties.map { method -> ktContributor(method, context) }
 
   val modifierFile = FileSpec.builder(pkg, modifier.name!!).addTypes(modifier, combinedModifier).build()
-  val contributorNodeFiles = List(overlayClass.setters.size) { index ->
+  val contributorNodeFiles = List(properties.size) { index ->
     val modifierNode = modifierNodes[index]
     val modifierExtension = modifierExtensions[index]
     val contributuionNode = contributionNodes[index]
@@ -70,14 +81,6 @@ fun main() = findAllOverlayClasses().forEach { overlayClass ->
       .addProperty(compositionLocal)
       .build()
 
-  val composableContentFile = ktContentComposable(
-    contentPkg = "$BASE_UI_PACKAGE.content",
-    compositionLocalPkg = compositionLocalFile.packageName,
-    delegatorPkg = modifierFile.packageName,
-    context = context,
-  )
-
-  val uiPath = Paths.get(uiModulePath)
   val modifierPath = Paths.get(modifierModulePath)
 
   println("delegate file saved at ${delegateFile.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
@@ -86,8 +89,69 @@ fun main() = findAllOverlayClasses().forEach { overlayClass ->
     println("[${file.name}] modifier file saved at ${file.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
   }
   println("composition local file saved at ${compositionLocalFile.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
-  println("composable content file saved at ${composableContentFile.writeTo(uiPath).toString().removePrefix(uiModulePath)}")
   println("\n")
+}
+
+private fun generateAllOverlayClasses() {
+  findAllOverlayClasses().forEach { overlayClass ->
+    val current = overlayClass.name.simpleName
+    val pkg = packageName(current.lowercase())
+    val context = GeneratorContext(pkg, overlayClass)
+
+    val delegate = ktDelegate(context)
+    val realDelegate = ktRealDelegate(context)
+    val delegateFile = FileSpec.builder(pkg, delegate.name!!)
+      .addTypes(delegate, realDelegate)
+      .addAnnotation(suppress("UsePropertyAccessSyntax"))
+      .build()
+
+    val modifier = ktModifier(context)
+    val combinedModifier = ktCombinedModifier(context)
+
+    val modifierNodes = overlayClass.setters.map { method -> ktModifierNode(method, context) }
+    val modifierExtensions = overlayClass.setters.map { method -> ktModifierExtension(method, context) }
+    val contributionNodes = overlayClass.setters.map { method -> ktContributionNode(method, context) }
+    val contributors = overlayClass.setters.map { method -> ktContributor(method, context) }
+
+    val modifierFile = FileSpec.builder(pkg, modifier.name!!).addTypes(modifier, combinedModifier).build()
+    val contributorNodeFiles = List(overlayClass.setters.size) { index ->
+      val modifierNode = modifierNodes[index]
+      val modifierExtension = modifierExtensions[index]
+      val contributuionNode = contributionNodes[index]
+      val contributor = contributors[index]
+
+      FileSpec.builder(pkg, modifierExtension.name)
+        .addTypes(modifierNode, contributuionNode, contributor)
+        .addFunction(modifierExtension)
+        .addAnnotation(suppress("RedundantVisibilityModifier"))
+        .build()
+    }
+
+    val compositionLocal = ktCompositionLocal(context)
+    val compositionLocalFile =
+      FileSpec.builder("$BASE_MODIFIER_PACKAGE.delegator", compositionLocal.name)
+        .addProperty(compositionLocal)
+        .build()
+
+    val composableContentFile = ktContentComposable(
+      contentPkg = "$BASE_UI_PACKAGE.content",
+      compositionLocalPkg = compositionLocalFile.packageName,
+      delegatorPkg = modifierFile.packageName,
+      context = context,
+    )
+
+    val uiPath = Paths.get(uiModulePath)
+    val modifierPath = Paths.get(modifierModulePath)
+
+    println("delegate file saved at ${delegateFile.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
+    println("modifier file saved at ${modifierFile.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
+    contributorNodeFiles.forEach { file ->
+      println("[${file.name}] modifier file saved at ${file.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
+    }
+    println("composition local file saved at ${compositionLocalFile.writeTo(modifierPath).toString().removePrefix(modifierModulePath)}")
+    println("composable content file saved at ${composableContentFile.writeTo(uiPath).toString().removePrefix(uiModulePath)}")
+    println("\n")
+  }
 }
 
 private fun packageName(name: String) = "$BASE_MODIFIER_PACKAGE.$name"

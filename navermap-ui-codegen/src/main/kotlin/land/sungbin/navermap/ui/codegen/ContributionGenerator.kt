@@ -21,9 +21,9 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.TypeSpec
-import land.sungbin.navermap.ui.codegen.parser.OverlayClass
+import land.sungbin.navermap.ui.codegen.parser.NaverMapClass
 
-internal fun ktContributionNode(method: OverlayClass.Method, context: GeneratorContext): TypeSpec {
+internal fun ktContributionNode(method: NaverMapClass.Method, context: GeneratorContext): TypeSpec {
   val delegatorClazz = ClassName(context.packageName, context.name(NameFlag.DELEGATE))
   val contributorClazz = ClassName(
     context.packageName,
@@ -91,7 +91,7 @@ internal fun ktContributionNode(method: OverlayClass.Method, context: GeneratorC
     .build()
 }
 
-internal fun ktContributor(method: OverlayClass.Method, context: GeneratorContext): TypeSpec {
+internal fun ktContributor(method: NaverMapClass.Method, context: GeneratorContext): TypeSpec {
   val delegatorClazz = ClassName(context.packageName, context.name(NameFlag.DELEGATE))
   val clear = method.parameters.any { (_, type) -> type.isNullable }
 

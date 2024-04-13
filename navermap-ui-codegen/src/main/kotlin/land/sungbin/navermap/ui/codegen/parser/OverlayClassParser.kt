@@ -23,6 +23,7 @@ import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
+import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Overlay
 import com.squareup.kotlinpoet.ARRAY
 import com.squareup.kotlinpoet.BOOLEAN
@@ -121,7 +122,7 @@ fun main() {
   print(GSON.toJson(findAllOverlayClasses()))
 }
 
-data class OverlayClass(
+data class NaverMapClass(
   val name: ClassName,
   val constructors: List<Method>,
   val setters: List<Method>,
@@ -134,7 +135,37 @@ data class OverlayClass(
   )
 }
 
-fun findAllOverlayClasses(): List<OverlayClass> {
+fun findNaverMapProperties(): List<NaverMapClass.Method> {
+  val scanResult: ScanResult
+  val navermap = ClassGraph()
+    .enableMethodInfo()
+    .enableAnnotationInfo()
+    .acceptPackagesNonRecursive(NaverMap::class.java.packageName)
+    .scan().also { scanResult = it }
+    .getClassInfo(NaverMap::class.java.name)
+
+  val properties = navermap.methodInfo.filter { it.isSetter() }.map { prop ->
+    NaverMapClass.Method(
+      name = prop.name,
+      parameters = prop.parameters().toList(),
+      deprecated = prop.hasAnnotation(java.lang.Deprecated::class.java),
+      javadocLink = buildString {
+        append("https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/NaverMap.html")
+        append("#${prop.name}")
+        append(
+          prop.parameterInfo.joinToString(separator = ",", prefix = "(", postfix = ")") { param ->
+            param.typeDescriptor.fqn(varargVisualizing = true)
+          },
+        )
+      },
+    )
+  }
+
+  scanResult.close()
+  return properties
+}
+
+fun findAllOverlayClasses(): List<NaverMapClass> {
   val scanResult: ScanResult
   val overlayClasses = ClassGraph()
     .enableMethodInfo()
@@ -148,10 +179,10 @@ fun findAllOverlayClasses(): List<OverlayClass> {
     val constructors = clazz.constructorInfo
     val setters = clazz.methodInfo.filter { it.isSetter() }
 
-    OverlayClass(
+    NaverMapClass(
       name = ClassName(clazz.packageName, clazz.simpleName),
       constructors = constructors.map { constructor ->
-        OverlayClass.Method(
+        NaverMapClass.Method(
           name = "<init>",
           parameters = constructor.parameters().toList(),
           deprecated = constructor.hasAnnotation(java.lang.Deprecated::class.java),
@@ -159,7 +190,7 @@ fun findAllOverlayClasses(): List<OverlayClass> {
         )
       },
       setters = setters.map { method ->
-        OverlayClass.Method(
+        NaverMapClass.Method(
           name = method.name,
           parameters = method.parameters().toList(),
           deprecated = method.hasAnnotation(java.lang.Deprecated::class.java),

@@ -16,9 +16,10 @@
 
 package land.sungbin.navermap.ui
 
+import com.naver.maps.map.CameraUpdate
 import land.sungbin.navermap.ui.contract.NaverMapContentScopeMarker
 
 @NaverMapContentScopeMarker
-public sealed interface NaverMapContent
-
-internal data object NaverMapContentScope : NaverMapContent
+public interface NaverMapContent {
+  public fun moveCamera(update: CameraUpdate)
+}

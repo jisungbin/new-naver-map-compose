@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.ui.contributor
+package land.sungbin.navermap.ui
 
 import android.content.ComponentCallbacks
 import android.content.Context

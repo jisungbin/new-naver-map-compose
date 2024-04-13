@@ -19,7 +19,7 @@ package land.sungbin.navermap.ui.codegen
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName.Companion.member
 import com.squareup.kotlinpoet.buildCodeBlock
-import land.sungbin.navermap.ui.codegen.parser.OverlayClass
+import land.sungbin.navermap.ui.codegen.parser.NaverMapClass
 
 @Suppress("ClassName")
 internal sealed interface NameFlag {
@@ -41,16 +41,16 @@ internal sealed interface NameFlag {
 
 internal class GeneratorContext(
   val packageName: String,
-  val overlayClass: ClassName,
-  val constructors: List<OverlayClass.Method>,
-  val overlayMethods: List<OverlayClass.Method>,
+  val clazz: ClassName,
+  val constructors: List<NaverMapClass.Method>,
+  val methods: List<NaverMapClass.Method>,
 ) {
-  constructor(packageName: String, overlayResult: OverlayClass) :
+  constructor(packageName: String, overlayResult: NaverMapClass) :
     this(
       packageName = packageName,
-      overlayClass = overlayResult.name,
+      clazz = overlayResult.name,
       constructors = overlayResult.constructors,
-      overlayMethods = overlayResult.setters,
+      methods = overlayResult.setters,
     )
 
   fun name(flag: NameFlag.NoName): String {
@@ -61,17 +61,17 @@ internal class GeneratorContext(
   fun normalizeName(name: String, flag: NameFlag) =
     when (flag) {
       NameFlag.NOOP -> "NoOp" // MarkerDelegate.Companion.[NoOp]
-      NameFlag.DELEGATE -> "${overlayClass.simpleName}Delegate" // MarkerDelegate
-      NameFlag.REAL_DELEGATE -> "Real${overlayClass.simpleName}Delegate" // RealMarkerDelegate
-      NameFlag.COMBINED -> "Combined${overlayClass.simpleName}Modifier" // CombinedOverlayModifier
-      NameFlag.MODIFIER -> "${overlayClass.simpleName}Modifier" // OverlayModifier
-      NameFlag.MODIFIER_NODE -> "${overlayClass.simpleName}${name.normalizeUppercase()}ModifierNode" // MarkerLatLngModifierNode
+      NameFlag.DELEGATE -> "${clazz.simpleName}Delegate" // MarkerDelegate
+      NameFlag.REAL_DELEGATE -> "Real${clazz.simpleName}Delegate" // RealMarkerDelegate
+      NameFlag.COMBINED -> "Combined${clazz.simpleName}Modifier" // CombinedOverlayModifier
+      NameFlag.MODIFIER -> "${clazz.simpleName}Modifier" // OverlayModifier
+      NameFlag.MODIFIER_NODE -> "${clazz.simpleName}${name.normalizeUppercase()}ModifierNode" // MarkerLatLngModifierNode
       NameFlag.MAP_MODIFIER_MAPPER -> "toMapModifier"
       NameFlag.MODIFIER_EXTENSION -> name.normalizeLowercase() // MarkerModifier.[offset]
-      NameFlag.CONTRIBUTOR -> "${overlayClass.simpleName}${name.normalizeUppercase()}Contributor" // MarkerLatLngContributor
-      NameFlag.CONTRIBUTION_NODE -> "${overlayClass.simpleName}${name.normalizeUppercase()}ContributionNode" // MarkerLatLngContributionNode
-      NameFlag.COMPOSITION_LOCAL -> "Local${overlayClass.simpleName}Delegator" // LocalMarkerDelegator
-      NameFlag.CONTENT_COMPOSABLE_FILE -> "NaverMap${overlayClass.simpleName}" // NaverMapMarker
+      NameFlag.CONTRIBUTOR -> "${clazz.simpleName}${name.normalizeUppercase()}Contributor" // MarkerLatLngContributor
+      NameFlag.CONTRIBUTION_NODE -> "${clazz.simpleName}${name.normalizeUppercase()}ContributionNode" // MarkerLatLngContributionNode
+      NameFlag.COMPOSITION_LOCAL -> "Local${clazz.simpleName}Delegator" // LocalMarkerDelegator
+      NameFlag.CONTENT_COMPOSABLE_FILE -> "NaverMap${clazz.simpleName}" // NaverMapMarker
     }
 
   fun noopDelegator() = buildCodeBlock {

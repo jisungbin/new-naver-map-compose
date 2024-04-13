@@ -29,7 +29,7 @@ public interface LocationOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, LocationOverlayModifier) -> R): R
 
   public infix fun then(other: LocationOverlayModifier): LocationOverlayModifier = if
-                                                                                     (other === LocationOverlayModifier) this else CombinedLocationOverlayModifier(this, other)
+    (other === LocationOverlayModifier) this else CombinedLocationOverlayModifier(this, other)
 
   public companion object : LocationOverlayModifier {
     override var delegator: LocationOverlayDelegate = NoOp
