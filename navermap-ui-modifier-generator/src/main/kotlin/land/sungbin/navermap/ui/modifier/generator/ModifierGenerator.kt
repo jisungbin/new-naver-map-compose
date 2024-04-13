@@ -124,7 +124,7 @@ internal fun ktModifier(context: GeneratorContext): TypeSpec {
       },
       ktFun("toString") {
         addModifiers(KModifier.OVERRIDE)
-        returns(String::class)
+        returns(STRING)
         addStatement("return %S", myClazz.simpleName)
       },
     )
