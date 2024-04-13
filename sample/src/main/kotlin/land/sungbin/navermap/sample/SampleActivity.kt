@@ -37,11 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.naver.maps.geometry.LatLng
 import kotlinx.coroutines.delay
-import land.sungbin.navermap.ui.Marker
 import land.sungbin.navermap.ui.NaverMap
+import land.sungbin.navermap.ui.content.Marker
 import land.sungbin.navermap.ui.modifier.marker.MarkerModifier
 import land.sungbin.navermap.ui.modifier.marker.captionText
-import land.sungbin.navermap.ui.modifier.marker.captionTextSize
 import land.sungbin.navermap.ui.modifier.marker.onClickListener
 
 class SampleActivity : ComponentActivity() {
@@ -60,7 +59,7 @@ class SampleActivity : ComponentActivity() {
           visible = showMap,
         ) {
           NaverMap(modifier = Modifier.fillMaxSize()) {
-            var now by remember { mutableLongStateOf(now) }
+            var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
             LaunchedEffect(Unit) {
               while (true) {
@@ -70,6 +69,7 @@ class SampleActivity : ComponentActivity() {
             }
 
             Marker(
+              LatLng(37.5670135, 126.9783740),
               modifier = MarkerModifier
                 .onClickListener {
                   Toast
@@ -78,7 +78,6 @@ class SampleActivity : ComponentActivity() {
                   true
                 }
                 .captionText("Current time is $now"),
-              position = LatLng(37.5670135, 126.9783740),
             )
           }
         }
@@ -89,5 +88,3 @@ class SampleActivity : ComponentActivity() {
     }
   }
 }
-
-private val now get() = System.currentTimeMillis()
