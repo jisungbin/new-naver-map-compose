@@ -64,7 +64,7 @@ public class OverlayNode(
     if (!delegator.isBound()) {
       val delegateIfExist = nodes.delegatorOrNull<OverlayDelegator>(Contributors.Overlay)
       delegator.bound(delegateIfExist ?: factory!!())
-      delegator.owner.setMap(layoutNode().naverMap())
+      delegator.owner.setMap(layoutNode().naverMap().instance)
       factory = null
       isAttached = true
     }

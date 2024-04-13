@@ -52,20 +52,18 @@ import land.sungbin.navermap.ui.contract.NaverMapContentComposable
 import land.sungbin.navermap.ui.contributor.mapLifecycle
 import com.naver.maps.map.R as NaverMapR
 
-private val NoContent: @[Composable NaverMapContentComposable] () -> Unit = {}
+private val NoContent: @[Composable NaverMapContentComposable] NaverMapContent.() -> Unit = {}
 
 @Composable
 public fun NaverMap(
   modifier: Modifier = Modifier,
   mapContentModifier: MapModifier = MapModifier,
-  mapContent: @[Composable NaverMapContentComposable] () -> Unit = NoContent,
+  mapContent: @[Composable NaverMapContentComposable] NaverMapContent.() -> Unit = NoContent,
 ) {
   val context = LocalContext.current
   var map by remember { mutableStateOf<MapView?>(null) }
 
-  if (map != null) {
-    AndroidView(modifier = modifier, factory = { map!! })
-  }
+  if (map != null) AndroidView(modifier = modifier, factory = { map!! })
 
   val parentCompositionContext = rememberCompositionContext()
   val compositionLocalContext = currentCompositionLocalContext
@@ -80,30 +78,32 @@ public fun NaverMap(
       .then(MapViewInstanceInterceptorNode { instance -> map = instance })
       .mapLifecycle(context, lifecycle, previousState, savedInstanceState)
   }
-  val mapLayoutNode = remember {
-    LayoutNode(
-      modifier = mapLayoutModifier then mapContentModifier,
-      factory = {
-        object : MapViewDelegator {
-          private val lazyInstance by lazy { unwrapAppCompat(MapView(context, NaverMapOptions())) }
-          override val instance: DelegatedMapView get() = lazyInstance
-          override fun getMapAsync(block: (NaverMapDelegator) -> Unit) {
-            lazyInstance.getMapAsync { map -> block(NaverMapDelegator(map)) }
-          }
-        }
-      },
-    )
-  }
 
   mapComposition.setContent {
     CompositionLocalProvider(compositionLocalContext) {
       ComposeNode<LayoutNode, MapApplier>(
-        factory = { mapLayoutNode },
-        update = {
-          update(mapContentModifier) { this.modifier = mapLayoutModifier then mapContentModifier }
+        factory = {
+          LayoutNode(
+            modifier = mapLayoutModifier then mapContentModifier,
+            factory = {
+              object : MapViewDelegator {
+                private val lazyInstance by lazy { unwrapAppCompat(MapView(context, NaverMapOptions())) }
+                override val instance: DelegatedMapView get() = lazyInstance
+                override fun getMapAsync(block: (NaverMapDelegator) -> Unit) {
+                  lazyInstance.getMapAsync { map -> block(NaverMapDelegator(map)) }
+                }
+              }
+            },
+          )
         },
-        content = mapContent,
-      )
+        update = {
+          update(mapContentModifier) {
+            this.modifier = mapLayoutModifier then it
+          }
+        },
+      ) {
+        NaverMapContentScope.mapContent()
+      }
     }
   }
 
