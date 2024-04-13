@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.multipartpathoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.MultipartPathOverlay
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -28,7 +27,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.multipartpathoverlay.MultipartPathOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class MultipartPathOverlayColorPartsModifierNode(
   private val arg0: List<MultipartPathOverlay.ColorPart>,
   override var delegator: MultipartPathOverlayDelegate = NoOp,
@@ -65,5 +64,9 @@ private class MultipartPathOverlayColorPartsContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/MultipartPathOverlay.html#setColorParts(java.util.List))
+ */
 @Stable
 public fun MultipartPathOverlayModifier.colorParts(arg0: List<MultipartPathOverlay.ColorPart>): MultipartPathOverlayModifier = this then MultipartPathOverlayColorPartsModifierNode(arg0)

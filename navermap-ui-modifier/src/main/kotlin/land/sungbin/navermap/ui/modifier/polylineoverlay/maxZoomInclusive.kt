@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.polylineoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.polylineoverlay.PolylineOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class PolylineOverlayMaxZoomInclusiveModifierNode(
   private val arg0: Boolean,
   override var delegator: PolylineOverlayDelegate = NoOp,
@@ -64,6 +63,10 @@ private class PolylineOverlayMaxZoomInclusiveContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMaxZoomInclusive(boolean))
+ */
 @Stable
 public fun PolylineOverlayModifier.maxZoomInclusive(arg0: Boolean): PolylineOverlayModifier =
   this then PolylineOverlayMaxZoomInclusiveModifierNode(arg0)

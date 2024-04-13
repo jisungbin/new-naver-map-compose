@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.marker
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.Align
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -28,7 +27,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.marker.MarkerDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class MarkerCaptionAlignModifierNode(
   private val arg0: Align,
   override var delegator: MarkerDelegate = NoOp,
@@ -65,6 +64,10 @@ private class MarkerCaptionAlignContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Marker.html#setCaptionAlign(com.naver.maps.map.overlay.Align))
+ */
 @Stable
 @Deprecated(
   "Deprecated from the original API.",

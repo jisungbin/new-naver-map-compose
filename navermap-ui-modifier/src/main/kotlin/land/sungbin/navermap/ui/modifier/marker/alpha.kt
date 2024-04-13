@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.marker
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.marker.MarkerDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class MarkerAlphaModifierNode(
   private val arg0: Float,
   override var delegator: MarkerDelegate = NoOp,
@@ -64,6 +63,10 @@ private class MarkerAlphaContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Marker.html#setAlpha(float))
+ */
 @Stable
 public fun MarkerModifier.alpha(arg0: Float): MarkerModifier =
   this then MarkerAlphaModifierNode(arg0)

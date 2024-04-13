@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.polylineoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.geometry.LatLng
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -28,7 +27,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.polylineoverlay.PolylineOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class PolylineOverlayCoordsModifierNode(
   private val arg0: List<LatLng>,
   override var delegator: PolylineOverlayDelegate = NoOp,
@@ -65,6 +64,10 @@ private class PolylineOverlayCoordsContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setCoords(java.util.List))
+ */
 @Stable
 public fun PolylineOverlayModifier.coords(arg0: List<LatLng>): PolylineOverlayModifier =
   this then PolylineOverlayCoordsModifierNode(arg0)

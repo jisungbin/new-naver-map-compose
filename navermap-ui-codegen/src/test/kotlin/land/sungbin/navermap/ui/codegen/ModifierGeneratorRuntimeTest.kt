@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.ui.modifier.generator
+package land.sungbin.navermap.ui.codegen
 
-import land.sungbin.navermap.ui.codegen.GeneratorContext
-import land.sungbin.navermap.ui.codegen.ktCombinedModifier
-import land.sungbin.navermap.ui.codegen.ktModifier
-import land.sungbin.navermap.ui.modifier.generator.dummy.dummyOverlayResult
+import land.sungbin.navermap.ui.codegen.dummy.dummyOverlayResult
 import kotlin.test.Test
 
 class ModifierGeneratorRuntimeTest {

@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.locationoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.locationoverlay.LocationOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class LocationOverlayCircleRadiusModifierNode(
   private val arg0: Int,
   override var delegator: LocationOverlayDelegate = NoOp,
@@ -64,6 +63,10 @@ private class LocationOverlayCircleRadiusContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/LocationOverlay.html#setCircleRadius(int))
+ */
 @Stable
 public fun LocationOverlayModifier.circleRadius(arg0: Int): LocationOverlayModifier =
   this then LocationOverlayCircleRadiusModifierNode(arg0)

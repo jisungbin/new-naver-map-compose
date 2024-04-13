@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.multipartpathoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.multipartpathoverlay.MultipartPathOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class MultipartPathOverlayVisibleModifierNode(
   private val arg0: Boolean,
   override var delegator: MultipartPathOverlayDelegate = NoOp,
@@ -64,6 +63,10 @@ private class MultipartPathOverlayVisibleContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setVisible(boolean))
+ */
 @Stable
 public fun MultipartPathOverlayModifier.visible(arg0: Boolean): MultipartPathOverlayModifier =
   this then MultipartPathOverlayVisibleModifierNode(arg0)

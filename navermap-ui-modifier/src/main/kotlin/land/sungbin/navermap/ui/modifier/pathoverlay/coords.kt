@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.pathoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.geometry.LatLng
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -28,7 +27,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.pathoverlay.PathOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class PathOverlayCoordsModifierNode(
   private val arg0: List<LatLng>,
   override var delegator: PathOverlayDelegate = NoOp,
@@ -65,6 +64,10 @@ private class PathOverlayCoordsContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PathOverlay.html#setCoords(java.util.List))
+ */
 @Stable
 public fun PathOverlayModifier.coords(arg0: List<LatLng>): PathOverlayModifier =
   this then PathOverlayCoordsModifierNode(arg0)

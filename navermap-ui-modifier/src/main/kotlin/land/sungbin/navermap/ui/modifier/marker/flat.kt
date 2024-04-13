@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.marker
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.marker.MarkerDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class MarkerFlatModifierNode(
   private val arg0: Boolean,
   override var delegator: MarkerDelegate = NoOp,
@@ -66,6 +65,10 @@ private class MarkerFlatContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Marker.html#setFlat(boolean))
+ */
 @Stable
 public fun MarkerModifier.flat(arg0: Boolean): MarkerModifier =
   this then MarkerFlatModifierNode(arg0)

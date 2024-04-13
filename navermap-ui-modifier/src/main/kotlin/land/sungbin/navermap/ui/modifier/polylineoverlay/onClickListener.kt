@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.polylineoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.Overlay
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.polylineoverlay.PolylineOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class PolylineOverlayOnClickListenerModifierNode(
   private val arg0: Overlay.OnClickListener?,
   override var delegator: PolylineOverlayDelegate = NoOp,
@@ -74,5 +73,9 @@ private class PolylineOverlayOnClickListenerContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setOnClickListener(com.naver.maps.map.overlay.Overlay.OnClickListener))
+ */
 @Stable
 public fun PolylineOverlayModifier.onClickListener(arg0: Overlay.OnClickListener?): PolylineOverlayModifier = this then PolylineOverlayOnClickListenerModifierNode(arg0)

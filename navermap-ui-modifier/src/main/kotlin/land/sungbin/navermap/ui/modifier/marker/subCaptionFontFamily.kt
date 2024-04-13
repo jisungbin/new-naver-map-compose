@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.marker
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.marker.MarkerDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class MarkerSubCaptionFontFamilyModifierNode(
   private val arg0: Array<String>,
   override var delegator: MarkerDelegate = NoOp,
@@ -64,6 +63,10 @@ private class MarkerSubCaptionFontFamilyContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Marker.html#setSubCaptionFontFamily(java.lang.String...))
+ */
 @Stable
 public fun MarkerModifier.subCaptionFontFamily(arg0: Array<String>): MarkerModifier =
   this then MarkerSubCaptionFontFamilyModifierNode(arg0)

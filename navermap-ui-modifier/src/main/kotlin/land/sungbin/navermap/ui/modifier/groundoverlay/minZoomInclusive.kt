@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.groundoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.groundoverlay.GroundOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class GroundOverlayMinZoomInclusiveModifierNode(
   private val arg0: Boolean,
   override var delegator: GroundOverlayDelegate = NoOp,
@@ -64,6 +63,10 @@ private class GroundOverlayMinZoomInclusiveContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMinZoomInclusive(boolean))
+ */
 @Stable
 public fun GroundOverlayModifier.minZoomInclusive(arg0: Boolean): GroundOverlayModifier =
   this then GroundOverlayMinZoomInclusiveModifierNode(arg0)

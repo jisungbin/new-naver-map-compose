@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.pathoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.OverlayImage
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -28,7 +27,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.pathoverlay.PathOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class PathOverlayPatternImageModifierNode(
   private val arg0: OverlayImage?,
   override var delegator: PathOverlayDelegate = NoOp,
@@ -74,6 +73,10 @@ private class PathOverlayPatternImageContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PathOverlay.html#setPatternImage(com.naver.maps.map.overlay.OverlayImage))
+ */
 @Stable
 public fun PathOverlayModifier.patternImage(arg0: OverlayImage?): PathOverlayModifier =
   this then PathOverlayPatternImageModifierNode(arg0)

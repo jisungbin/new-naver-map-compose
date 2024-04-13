@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.polygonoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.polygonoverlay.PolygonOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class PolygonOverlayZIndexModifierNode(
   private val arg0: Int,
   override var delegator: PolygonOverlayDelegate = NoOp,
@@ -64,6 +63,10 @@ private class PolygonOverlayZIndexContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setZIndex(int))
+ */
 @Stable
 public fun PolygonOverlayModifier.zIndex(arg0: Int): PolygonOverlayModifier =
   this then PolygonOverlayZIndexModifierNode(arg0)

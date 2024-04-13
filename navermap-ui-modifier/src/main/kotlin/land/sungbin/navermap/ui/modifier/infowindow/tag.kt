@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.infowindow
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.infowindow.InfoWindowDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class InfoWindowTagModifierNode(
   private val arg0: Any?,
   override var delegator: InfoWindowDelegate = NoOp,
@@ -73,6 +72,10 @@ private class InfoWindowTagContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setTag(java.lang.Object))
+ */
 @Stable
 public fun InfoWindowModifier.tag(arg0: Any?): InfoWindowModifier =
   this then InfoWindowTagModifierNode(arg0)

@@ -29,7 +29,7 @@ public interface PolygonOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, PolygonOverlayModifier) -> R): R
 
   public infix fun then(other: PolygonOverlayModifier): PolygonOverlayModifier = if
-    (other === PolygonOverlayModifier) this else CombinedPolygonOverlayModifier(this, other)
+                                                                                   (other === PolygonOverlayModifier) this else CombinedPolygonOverlayModifier(this, other)
 
   public companion object : PolygonOverlayModifier {
     override var delegator: PolygonOverlayDelegate = NoOp

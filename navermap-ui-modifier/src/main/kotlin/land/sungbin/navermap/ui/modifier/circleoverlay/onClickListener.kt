@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.circleoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.Overlay
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.circleoverlay.CircleOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class CircleOverlayOnClickListenerModifierNode(
   private val arg0: Overlay.OnClickListener?,
   override var delegator: CircleOverlayDelegate = NoOp,
@@ -74,5 +73,9 @@ private class CircleOverlayOnClickListenerContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setOnClickListener(com.naver.maps.map.overlay.Overlay.OnClickListener))
+ */
 @Stable
 public fun CircleOverlayModifier.onClickListener(arg0: Overlay.OnClickListener?): CircleOverlayModifier = this then CircleOverlayOnClickListenerModifierNode(arg0)

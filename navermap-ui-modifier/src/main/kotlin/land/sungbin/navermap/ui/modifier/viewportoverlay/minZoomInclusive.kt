@@ -18,8 +18,10 @@
 
 package land.sungbin.navermap.ui.modifier.viewportoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import kotlin.Any
+import kotlin.Boolean
+import kotlin.Suppress
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -27,7 +29,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.viewportoverlay.ViewportOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class ViewportOverlayMinZoomInclusiveModifierNode(
   private val arg0: Boolean,
   override var delegator: ViewportOverlayDelegate = NoOp,
@@ -64,6 +66,10 @@ private class ViewportOverlayMinZoomInclusiveContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMinZoomInclusive(boolean))
+ */
 @Stable
 public fun ViewportOverlayModifier.minZoomInclusive(arg0: Boolean): ViewportOverlayModifier =
   this then ViewportOverlayMinZoomInclusiveModifierNode(arg0)

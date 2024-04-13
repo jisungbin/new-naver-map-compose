@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.groundoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.OverlayImage
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -28,7 +27,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.groundoverlay.GroundOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class GroundOverlayImageModifierNode(
   private val arg0: OverlayImage,
   override var delegator: GroundOverlayDelegate = NoOp,
@@ -65,6 +64,10 @@ private class GroundOverlayImageContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/GroundOverlay.html#setImage(com.naver.maps.map.overlay.OverlayImage))
+ */
 @Stable
 public fun GroundOverlayModifier.image(arg0: OverlayImage): GroundOverlayModifier =
   this then GroundOverlayImageModifierNode(arg0)

@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.locationoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.OverlayImage
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -28,7 +27,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.locationoverlay.LocationOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class LocationOverlayIconModifierNode(
   private val arg0: OverlayImage,
   override var delegator: LocationOverlayDelegate = NoOp,
@@ -65,6 +64,10 @@ private class LocationOverlayIconContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/LocationOverlay.html#setIcon(com.naver.maps.map.overlay.OverlayImage))
+ */
 @Stable
 public fun LocationOverlayModifier.icon(arg0: OverlayImage): LocationOverlayModifier =
   this then LocationOverlayIconModifierNode(arg0)

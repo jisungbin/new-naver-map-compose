@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.infowindow
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.infowindow.InfoWindowDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class InfoWindowMinZoomModifierNode(
   private val arg0: Double,
   override var delegator: InfoWindowDelegate = NoOp,
@@ -64,6 +63,10 @@ private class InfoWindowMinZoomContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMinZoom(double))
+ */
 @Stable
 public fun InfoWindowModifier.minZoom(arg0: Double): InfoWindowModifier =
   this then InfoWindowMinZoomModifierNode(arg0)

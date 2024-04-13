@@ -29,7 +29,7 @@ public interface InfoWindowModifier {
   public fun <R : Any> fold(initial: R, operation: (R, InfoWindowModifier) -> R): R
 
   public infix fun then(other: InfoWindowModifier): InfoWindowModifier = if
-    (other === InfoWindowModifier) this else CombinedInfoWindowModifier(this, other)
+                                                                           (other === InfoWindowModifier) this else CombinedInfoWindowModifier(this, other)
 
   public companion object : InfoWindowModifier {
     override var delegator: InfoWindowDelegate = NoOp

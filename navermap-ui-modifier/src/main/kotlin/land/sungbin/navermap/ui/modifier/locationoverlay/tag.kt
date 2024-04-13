@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.locationoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.locationoverlay.LocationOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class LocationOverlayTagModifierNode(
   private val arg0: Any?,
   override var delegator: LocationOverlayDelegate = NoOp,
@@ -73,6 +72,10 @@ private class LocationOverlayTagContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setTag(java.lang.Object))
+ */
 @Stable
 public fun LocationOverlayModifier.tag(arg0: Any?): LocationOverlayModifier =
   this then LocationOverlayTagModifierNode(arg0)

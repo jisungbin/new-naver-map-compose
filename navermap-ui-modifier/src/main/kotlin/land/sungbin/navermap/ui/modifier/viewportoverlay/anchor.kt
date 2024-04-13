@@ -19,7 +19,6 @@
 package land.sungbin.navermap.ui.modifier.viewportoverlay
 
 import android.graphics.PointF
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -28,7 +27,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.viewportoverlay.ViewportOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class ViewportOverlayAnchorModifierNode(
   private val arg0: PointF,
   override var delegator: ViewportOverlayDelegate = NoOp,
@@ -65,6 +64,10 @@ private class ViewportOverlayAnchorContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/ViewportOverlay.html#setAnchor(android.graphics.PointF))
+ */
 @Stable
 public fun ViewportOverlayModifier.anchor(arg0: PointF): ViewportOverlayModifier =
   this then ViewportOverlayAnchorModifierNode(arg0)

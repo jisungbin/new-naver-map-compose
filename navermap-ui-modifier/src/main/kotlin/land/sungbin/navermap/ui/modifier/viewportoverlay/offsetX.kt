@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.viewportoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.viewportoverlay.ViewportOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class ViewportOverlayOffsetXModifierNode(
   private val arg0: Int,
   override var delegator: ViewportOverlayDelegate = NoOp,
@@ -64,6 +63,10 @@ private class ViewportOverlayOffsetXContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/ViewportOverlay.html#setOffsetX(int))
+ */
 @Stable
 public fun ViewportOverlayModifier.offsetX(arg0: Int): ViewportOverlayModifier =
   this then ViewportOverlayOffsetXModifierNode(arg0)

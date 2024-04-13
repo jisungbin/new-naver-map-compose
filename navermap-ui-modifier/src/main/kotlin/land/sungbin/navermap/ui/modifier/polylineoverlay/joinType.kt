@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.polylineoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.PolylineOverlay
 import land.sungbin.navermap.runtime.contributor.ContributionKind
@@ -28,7 +27,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.polylineoverlay.PolylineOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class PolylineOverlayJoinTypeModifierNode(
   private val arg0: PolylineOverlay.LineJoin,
   override var delegator: PolylineOverlayDelegate = NoOp,
@@ -65,5 +64,9 @@ private class PolylineOverlayJoinTypeContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setJoinType(com.naver.maps.map.overlay.PolylineOverlay.LineJoin))
+ */
 @Stable
 public fun PolylineOverlayModifier.joinType(arg0: PolylineOverlay.LineJoin): PolylineOverlayModifier = this then PolylineOverlayJoinTypeModifierNode(arg0)

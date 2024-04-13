@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.pathoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.pathoverlay.PathOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class PathOverlayMaxZoomModifierNode(
   private val arg0: Double,
   override var delegator: PathOverlayDelegate = NoOp,
@@ -64,6 +63,10 @@ private class PathOverlayMaxZoomContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMaxZoom(double))
+ */
 @Stable
 public fun PathOverlayModifier.maxZoom(arg0: Double): PathOverlayModifier =
   this then PathOverlayMaxZoomModifierNode(arg0)

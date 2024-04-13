@@ -17,9 +17,13 @@
 package land.sungbin.navermap.ui.modifier.pathoverlay
 
 import androidx.compose.runtime.Stable
+import java.lang.System.identityHashCode
+import kotlin.Any
+import kotlin.Boolean
+import kotlin.Int
+import kotlin.String
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.pathoverlay.PathOverlayDelegate.Companion.NoOp
-import java.lang.System.identityHashCode
 
 public interface PathOverlayModifier {
   public var delegator: PathOverlayDelegate
@@ -29,7 +33,7 @@ public interface PathOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, PathOverlayModifier) -> R): R
 
   public infix fun then(other: PathOverlayModifier): PathOverlayModifier = if
-    (other === PathOverlayModifier) this else CombinedPathOverlayModifier(this, other)
+                                                                             (other === PathOverlayModifier) this else CombinedPathOverlayModifier(this, other)
 
   public companion object : PathOverlayModifier {
     override var delegator: PathOverlayDelegate = NoOp

@@ -29,7 +29,7 @@ public interface ArrowheadPathOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, ArrowheadPathOverlayModifier) -> R): R
 
   public infix fun then(other: ArrowheadPathOverlayModifier): ArrowheadPathOverlayModifier = if
-    (other === ArrowheadPathOverlayModifier) this else CombinedArrowheadPathOverlayModifier(
+                                                                                               (other === ArrowheadPathOverlayModifier) this else CombinedArrowheadPathOverlayModifier(
     this,
     other,
   )

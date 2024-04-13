@@ -29,7 +29,7 @@ public interface MultipartPathOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, MultipartPathOverlayModifier) -> R): R
 
   public infix fun then(other: MultipartPathOverlayModifier): MultipartPathOverlayModifier = if
-    (other === MultipartPathOverlayModifier) this else CombinedMultipartPathOverlayModifier(
+                                                                                               (other === MultipartPathOverlayModifier) this else CombinedMultipartPathOverlayModifier(
     this,
     other,
   )

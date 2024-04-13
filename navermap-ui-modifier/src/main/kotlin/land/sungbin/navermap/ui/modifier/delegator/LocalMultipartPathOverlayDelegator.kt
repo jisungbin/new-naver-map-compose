@@ -18,10 +18,10 @@ package land.sungbin.navermap.ui.modifier.delegator
 
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
-import land.sungbin.navermap.ui.modifier.arrowheadpathoverlay.ArrowheadPathOverlayDelegate
-import land.sungbin.navermap.ui.modifier.arrowheadpathoverlay.RealArrowheadPathOverlayDelegate
+import land.sungbin.navermap.ui.modifier.multipartpathoverlay.MultipartPathOverlayDelegate
+import land.sungbin.navermap.ui.modifier.multipartpathoverlay.RealMultipartPathOverlayDelegate
 
-public val LocalArrowheadPathOverlayDelegator:
-  ProvidableCompositionLocal<ArrowheadPathOverlayDelegate> = staticCompositionLocalOf {
-    RealArrowheadPathOverlayDelegate
-  }
+public val LocalMultipartPathOverlayDelegator:
+  ProvidableCompositionLocal<MultipartPathOverlayDelegate> = staticCompositionLocalOf {
+  RealMultipartPathOverlayDelegate
+}

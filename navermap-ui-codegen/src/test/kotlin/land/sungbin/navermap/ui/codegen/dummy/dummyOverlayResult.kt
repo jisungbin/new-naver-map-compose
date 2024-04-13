@@ -14,13 +14,40 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.ui.modifier.generator.dummy
+package land.sungbin.navermap.ui.codegen.dummy
 
 import com.squareup.kotlinpoet.ClassName
 import land.sungbin.navermap.ui.codegen.parser.OverlayClass
 
 val dummyOverlayResult = OverlayClass(
   name = ClassName("my.map.service", "Marker"),
+  constructors = listOf(
+    OverlayClass.Method(
+      name = "",
+      parameters = emptyList(),
+      deprecated = false,
+      javadocLink = "https://my.javadoc.link/constructor",
+    ),
+    OverlayClass.Method(
+      name = "",
+      parameters = mapOf(
+        "position" to ClassName("my.map.service", "LatLng"),
+        "position2" to ClassName("my.map.service", "LatLng2"),
+      ).toList(),
+      deprecated = false,
+      javadocLink = "https://my.javadoc.link/constructor",
+    ),
+    OverlayClass.Method(
+      name = "",
+      parameters = mapOf(
+        "position" to ClassName("my.map.service", "LatLng"),
+        "icon" to ClassName("my.icon.service", "Icon").copy(nullable = true) as ClassName,
+        "icon2" to ClassName("my.icon.service", "Icon2").copy(nullable = true) as ClassName,
+      ).toList(),
+      deprecated = false,
+      javadocLink = "https://my.javadoc.link/icon",
+    ),
+  ),
   setters = listOf(
     OverlayClass.Method(
       name = "position",
@@ -31,7 +58,7 @@ val dummyOverlayResult = OverlayClass(
         "position4" to ClassName("my.map.service", "LatLng4"),
       ).toList(),
       deprecated = false,
-      javadocLink = "https://my.javadoc.link/position",
+      javadocLink = "https://my.javadoc.link/icon",
     ),
     OverlayClass.Method(
       name = "icon",

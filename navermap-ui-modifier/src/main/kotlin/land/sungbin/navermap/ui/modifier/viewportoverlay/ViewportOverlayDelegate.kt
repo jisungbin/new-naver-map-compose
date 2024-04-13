@@ -24,6 +24,12 @@ import com.naver.maps.map.overlay.Align
 import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.overlay.ViewportOverlay
+import kotlin.Any
+import kotlin.Boolean
+import kotlin.Double
+import kotlin.Float
+import kotlin.Int
+import kotlin.Suppress
 
 public interface ViewportOverlayDelegate {
   /**

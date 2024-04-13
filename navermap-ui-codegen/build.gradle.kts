@@ -45,16 +45,14 @@ android {
   }
 }
 
-tasks.withType<Test> {
-  enabled = false
-}
-
 dependencies {
-  implementation(libs.compose.runtime)
   implementation(libs.navermap)
   implementation(libs.classgraph)
   implementation(libs.kotlinpoet)
+  implementation(libs.compose.runtime)
+
   implementation(projects.navermapRuntime)
+  implementation(projects.navermapUi)
 
   // noinspection UseTomlInstead (debug only)
   implementation("com.google.code.gson:gson:2.10.1")

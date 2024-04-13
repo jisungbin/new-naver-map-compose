@@ -18,9 +18,11 @@
 
 package land.sungbin.navermap.ui.modifier.circleoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.NaverMap
+import kotlin.Any
+import kotlin.Suppress
+import kotlin.Unit
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -28,7 +30,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.circleoverlay.CircleOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class CircleOverlayMapModifierNode(
   private val arg0: NaverMap?,
   override var delegator: CircleOverlayDelegate = NoOp,
@@ -74,6 +76,10 @@ private class CircleOverlayMapContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/CircleOverlay.html#setMap(com.naver.maps.map.NaverMap))
+ */
 @Stable
 public fun CircleOverlayModifier.map(arg0: NaverMap?): CircleOverlayModifier =
   this then CircleOverlayMapModifierNode(arg0)

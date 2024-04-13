@@ -29,7 +29,7 @@ public interface CircleOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, CircleOverlayModifier) -> R): R
 
   public infix fun then(other: CircleOverlayModifier): CircleOverlayModifier = if
-    (other === CircleOverlayModifier) this else CombinedCircleOverlayModifier(this, other)
+                                                                                 (other === CircleOverlayModifier) this else CombinedCircleOverlayModifier(this, other)
 
   public companion object : CircleOverlayModifier {
     override var delegator: CircleOverlayDelegate = NoOp

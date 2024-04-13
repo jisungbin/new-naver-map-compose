@@ -18,11 +18,7 @@
 
 package land.sungbin.navermap.ui.modifier.circleoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import kotlin.Any
-import kotlin.Int
-import kotlin.Suppress
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -30,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.circleoverlay.CircleOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class CircleOverlayOutlineColorModifierNode(
   private val arg0: Int,
   override var delegator: CircleOverlayDelegate = NoOp,
@@ -67,6 +63,10 @@ private class CircleOverlayOutlineColorContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/CircleOverlay.html#setOutlineColor(int))
+ */
 @Stable
 public fun CircleOverlayModifier.outlineColor(arg0: Int): CircleOverlayModifier =
   this then CircleOverlayOutlineColorModifierNode(arg0)

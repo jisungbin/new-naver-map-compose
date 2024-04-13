@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.multipartpathoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.multipartpathoverlay.MultipartPathOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class MultipartPathOverlayPatternIntervalModifierNode(
   private val arg0: Int,
   override var delegator: MultipartPathOverlayDelegate = NoOp,
@@ -67,6 +66,10 @@ private class MultipartPathOverlayPatternIntervalContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/MultipartPathOverlay.html#setPatternInterval(int))
+ */
 @Stable
 public fun MultipartPathOverlayModifier.patternInterval(arg0: Int): MultipartPathOverlayModifier =
   this then MultipartPathOverlayPatternIntervalModifierNode(arg0)

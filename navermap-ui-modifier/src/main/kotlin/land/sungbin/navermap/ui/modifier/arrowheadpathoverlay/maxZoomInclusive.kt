@@ -18,7 +18,6 @@
 
 package land.sungbin.navermap.ui.modifier.arrowheadpathoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
@@ -27,7 +26,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.arrowheadpathoverlay.ArrowheadPathOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class ArrowheadPathOverlayMaxZoomInclusiveModifierNode(
   private val arg0: Boolean,
   override var delegator: ArrowheadPathOverlayDelegate = NoOp,
@@ -67,5 +66,9 @@ private class ArrowheadPathOverlayMaxZoomInclusiveContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMaxZoomInclusive(boolean))
+ */
 @Stable
 public fun ArrowheadPathOverlayModifier.maxZoomInclusive(arg0: Boolean): ArrowheadPathOverlayModifier = this then ArrowheadPathOverlayMaxZoomInclusiveModifierNode(arg0)

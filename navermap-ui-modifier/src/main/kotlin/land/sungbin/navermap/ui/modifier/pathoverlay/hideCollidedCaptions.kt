@@ -18,8 +18,10 @@
 
 package land.sungbin.navermap.ui.modifier.pathoverlay
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import kotlin.Any
+import kotlin.Boolean
+import kotlin.Suppress
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -27,7 +29,7 @@ import land.sungbin.navermap.runtime.contributor.OverlayContributor
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.pathoverlay.PathOverlayDelegate.Companion.NoOp
 
-@Immutable
+@Stable
 private data class PathOverlayHideCollidedCaptionsModifierNode(
   private val arg0: Boolean,
   override var delegator: PathOverlayDelegate = NoOp,
@@ -64,6 +66,10 @@ private class PathOverlayHideCollidedCaptionsContributor(
   }
 }
 
+/**
+ * See
+ * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PathOverlay.html#setHideCollidedCaptions(boolean))
+ */
 @Stable
 public fun PathOverlayModifier.hideCollidedCaptions(arg0: Boolean): PathOverlayModifier =
   this then PathOverlayHideCollidedCaptionsModifierNode(arg0)
