@@ -17,13 +17,9 @@
 package land.sungbin.navermap.ui.modifier.infowindow
 
 import androidx.compose.runtime.Stable
-import java.lang.System.identityHashCode
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.infowindow.InfoWindowDelegate.Companion.NoOp
+import java.lang.System.identityHashCode
 
 public interface InfoWindowModifier {
   public var delegator: InfoWindowDelegate
@@ -33,7 +29,7 @@ public interface InfoWindowModifier {
   public fun <R : Any> fold(initial: R, operation: (R, InfoWindowModifier) -> R): R
 
   public infix fun then(other: InfoWindowModifier): InfoWindowModifier = if
-    (other === InfoWindowModifier) this else CombinedInfoWindowModifier(this, other)
+                                                                           (other === InfoWindowModifier) this else CombinedInfoWindowModifier(this, other)
 
   public companion object : InfoWindowModifier {
     override var delegator: InfoWindowDelegate = NoOp

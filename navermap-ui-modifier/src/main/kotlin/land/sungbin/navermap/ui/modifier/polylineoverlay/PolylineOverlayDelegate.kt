@@ -14,79 +14,77 @@
  * limitations under the License.
  */
 
+@file:Suppress("UsePropertyAccessSyntax")
+
 package land.sungbin.navermap.ui.modifier.polylineoverlay
 
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.overlay.PolylineOverlay
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Double
-import kotlin.Int
 
 public interface PolylineOverlayDelegate {
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setMap(com.naver.maps.map.NaverMap))
    */
-  public fun setMap(instance: Any, arg0: NaverMap?) {
+  public fun setMap(instance: Any, arg0: Any?) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setGlobalZIndex(int))
    */
-  public fun setGlobalZIndex(instance: Any, arg0: Int) {
+  public fun setGlobalZIndex(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setCoords(java.util.List))
    */
-  public fun setCoords(instance: Any, arg0: List<LatLng>) {
+  public fun setCoords(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setWidth(int))
    */
-  public fun setWidth(instance: Any, arg0: Int) {
+  public fun setWidth(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setColor(int))
    */
-  public fun setColor(instance: Any, arg0: Int) {
+  public fun setColor(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setPattern(int...))
    */
-  public fun setPattern(instance: Any, arg0: IntArray) {
+  public fun setPattern(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setCapType(com.naver.maps.map.overlay.PolylineOverlay.LineCap))
    */
-  public fun setCapType(instance: Any, arg0: PolylineOverlay.LineCap) {
+  public fun setCapType(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/PolylineOverlay.html#setJoinType(com.naver.maps.map.overlay.PolylineOverlay.LineJoin))
    */
-  public fun setJoinType(instance: Any, arg0: PolylineOverlay.LineJoin) {
+  public fun setJoinType(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setOnClickListener(com.naver.maps.map.overlay.Overlay.OnClickListener))
    */
-  public fun setOnClickListener(instance: Any, arg0: Overlay.OnClickListener?) {
+  public fun setOnClickListener(instance: Any, arg0: Any?) {
   }
 
   /**
@@ -100,42 +98,42 @@ public interface PolylineOverlayDelegate {
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setVisible(boolean))
    */
-  public fun setVisible(instance: Any, arg0: Boolean) {
+  public fun setVisible(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMinZoom(double))
    */
-  public fun setMinZoom(instance: Any, arg0: Double) {
+  public fun setMinZoom(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMaxZoom(double))
    */
-  public fun setMaxZoom(instance: Any, arg0: Double) {
+  public fun setMaxZoom(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMinZoomInclusive(boolean))
    */
-  public fun setMinZoomInclusive(instance: Any, arg0: Boolean) {
+  public fun setMinZoomInclusive(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMaxZoomInclusive(boolean))
    */
-  public fun setMaxZoomInclusive(instance: Any, arg0: Boolean) {
+  public fun setMaxZoomInclusive(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setZIndex(int))
    */
-  public fun setZIndex(instance: Any, arg0: Int) {
+  public fun setZIndex(instance: Any, arg0: Any) {
   }
 
   public companion object {
@@ -144,48 +142,58 @@ public interface PolylineOverlayDelegate {
 }
 
 public object RealPolylineOverlayDelegate : PolylineOverlayDelegate {
-  override fun setMap(instance: Any, arg0: NaverMap?) {
+  override fun setMap(instance: Any, arg0: Any?) {
     require(instance is PolylineOverlay)
+    require(arg0 is NaverMap?)
     instance.setMap(arg0)
   }
 
-  override fun setGlobalZIndex(instance: Any, arg0: Int) {
+  override fun setGlobalZIndex(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is Int)
     instance.setGlobalZIndex(arg0)
   }
 
-  override fun setCoords(instance: Any, arg0: List<LatLng>) {
+  @Suppress("CANNOT_CHECK_FOR_ERASED")
+  override fun setCoords(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is List<LatLng>)
     instance.setCoords(arg0)
   }
 
-  override fun setWidth(instance: Any, arg0: Int) {
+  override fun setWidth(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is Int)
     instance.setWidth(arg0)
   }
 
-  override fun setColor(instance: Any, arg0: Int) {
+  override fun setColor(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is Int)
     instance.setColor(arg0)
   }
 
-  override fun setPattern(instance: Any, arg0: IntArray) {
+  override fun setPattern(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is IntArray)
     instance.setPattern(*arg0)
   }
 
-  override fun setCapType(instance: Any, arg0: PolylineOverlay.LineCap) {
+  override fun setCapType(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is PolylineOverlay.LineCap)
     instance.setCapType(arg0)
   }
 
-  override fun setJoinType(instance: Any, arg0: PolylineOverlay.LineJoin) {
+  override fun setJoinType(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is PolylineOverlay.LineJoin)
     instance.setJoinType(arg0)
   }
 
-  override fun setOnClickListener(instance: Any, arg0: Overlay.OnClickListener?) {
+  override fun setOnClickListener(instance: Any, arg0: Any?) {
     require(instance is PolylineOverlay)
+    require(arg0 is Overlay.OnClickListener?)
     instance.setOnClickListener(arg0)
   }
 
@@ -194,33 +202,39 @@ public object RealPolylineOverlayDelegate : PolylineOverlayDelegate {
     instance.setTag(arg0)
   }
 
-  override fun setVisible(instance: Any, arg0: Boolean) {
+  override fun setVisible(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is Boolean)
     instance.setVisible(arg0)
   }
 
-  override fun setMinZoom(instance: Any, arg0: Double) {
+  override fun setMinZoom(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is Double)
     instance.setMinZoom(arg0)
   }
 
-  override fun setMaxZoom(instance: Any, arg0: Double) {
+  override fun setMaxZoom(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is Double)
     instance.setMaxZoom(arg0)
   }
 
-  override fun setMinZoomInclusive(instance: Any, arg0: Boolean) {
+  override fun setMinZoomInclusive(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is Boolean)
     instance.setMinZoomInclusive(arg0)
   }
 
-  override fun setMaxZoomInclusive(instance: Any, arg0: Boolean) {
+  override fun setMaxZoomInclusive(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is Boolean)
     instance.setMaxZoomInclusive(arg0)
   }
 
-  override fun setZIndex(instance: Any, arg0: Int) {
+  override fun setZIndex(instance: Any, arg0: Any) {
     require(instance is PolylineOverlay)
+    require(arg0 is Int)
     instance.setZIndex(arg0)
   }
 }

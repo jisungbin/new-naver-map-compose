@@ -17,13 +17,9 @@
 package land.sungbin.navermap.ui.modifier.arrowheadpathoverlay
 
 import androidx.compose.runtime.Stable
-import java.lang.System.identityHashCode
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.arrowheadpathoverlay.ArrowheadPathOverlayDelegate.Companion.NoOp
+import java.lang.System.identityHashCode
 
 public interface ArrowheadPathOverlayModifier {
   public var delegator: ArrowheadPathOverlayDelegate
@@ -33,7 +29,7 @@ public interface ArrowheadPathOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, ArrowheadPathOverlayModifier) -> R): R
 
   public infix fun then(other: ArrowheadPathOverlayModifier): ArrowheadPathOverlayModifier = if
-    (other === ArrowheadPathOverlayModifier) this else CombinedArrowheadPathOverlayModifier(
+                                                                                               (other === ArrowheadPathOverlayModifier) this else CombinedArrowheadPathOverlayModifier(
     this,
     other,
   )

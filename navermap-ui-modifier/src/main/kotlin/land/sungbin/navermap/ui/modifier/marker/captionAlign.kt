@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+@file:Suppress("RedundantVisibilityModifier")
+
 package land.sungbin.navermap.ui.modifier.marker
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.Align
-import kotlin.Any
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -65,5 +66,9 @@ private class MarkerCaptionAlignContributor(
 }
 
 @Stable
+@Deprecated(
+  "Deprecated from the original API.",
+  ReplaceWith(""),
+)
 public fun MarkerModifier.captionAlign(arg0: Align): MarkerModifier =
   this then MarkerCaptionAlignModifierNode(arg0)

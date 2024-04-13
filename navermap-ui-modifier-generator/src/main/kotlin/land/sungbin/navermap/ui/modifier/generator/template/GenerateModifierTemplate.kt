@@ -28,7 +28,7 @@ import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.runtime.node.DelegatedOverlay
 
 interface MarkerDelegate {
-  fun setPosition(instance: DelegatedOverlay, latlng: LatLng?) {}
+  fun setPosition(instance: DelegatedOverlay, latlng: Any) {}
 
   companion object {
     val NoOp = object : MarkerDelegate {}
@@ -37,9 +37,10 @@ interface MarkerDelegate {
 
 @Suppress("unused")
 object RealMarkerDelegate : MarkerDelegate {
-  override fun setPosition(instance: DelegatedOverlay, latlng: LatLng?) {
+  override fun setPosition(instance: DelegatedOverlay, latlng: Any) {
     require(instance is Marker)
-    instance.position = latlng!!
+    require(latlng is LatLng)
+    instance.position = latlng
   }
 }
 
@@ -137,6 +138,6 @@ private class MarkerLatLngContributor(
 
   override fun DelegatedOverlay.contribute() {
     delegate.setPosition(this, latlng)
-    clear = { delegate.setPosition(this, null) }
+    clear = { delegate.setPosition(this, LatLng.INVALID) }
   }
 }

@@ -16,8 +16,11 @@
 
 package land.sungbin.navermap.ui.modifier.generator
 
+import com.squareup.kotlinpoet.ANY
+import com.squareup.kotlinpoet.ARRAY
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.TypeSpec
 
 internal fun ktDelegate(context: GeneratorContext): TypeSpec {
@@ -30,7 +33,9 @@ internal fun ktDelegate(context: GeneratorContext): TypeSpec {
         val methodFun = ktFun(method.name) {
           addKdoc("See [official·document](${method.javadocLink})")
           addParameter("instance", DELEGATED_OVERLAY)
-          method.parameters.forEach { (name, type) -> addParameter(name, type) }
+          method.parameters.forEach { (name, type) ->
+            addParameter(name, if (type.isNullable) ANY_NULLABLE else ANY)
+          }
         }
         addFunction(methodFun)
       }
@@ -54,11 +59,28 @@ internal fun ktRealDelegate(context: GeneratorContext): TypeSpec {
       addSuperinterface(delegatorClazz)
       context.overlayMethods.forEach { method ->
         val methodFun = ktFun(method.name) {
+          val suppression = arrayListOf<String>()
+          if (method.parameters.any { (_, type) -> type is ParameterizedTypeName }) {
+            suppression += "CANNOT_CHECK_FOR_ERASED"
+          }
+          if (method.deprecated) suppression += "DEPRECATION"
+          if (suppression.isNotEmpty()) {
+            addAnnotation(suppress(*suppression.toTypedArray()))
+          }
           addModifiers(KModifier.OVERRIDE)
           addParameter("instance", DELEGATED_OVERLAY)
-          method.parameters.forEach { (name, type) -> addParameter(name, type) }
+          method.parameters.forEach { (name, type) ->
+            addParameter(name, if (type.isNullable) ANY_NULLABLE else ANY)
+          }
           addStatement("require(instance·is·%T)", context.overlayClass)
-          method.parameters.forEach { (name) -> addStatement("instance.%L(%L)", method.name, name) }
+          method.parameters.forEach { (name, type) ->
+            if (type != ANY_NULLABLE) addStatement("require(%L·is·%T)", name, type)
+            val isVararg = (
+              (type is ClassName && type.simpleName.endsWith("Array")) ||
+                (type is ParameterizedTypeName && type.rawType == ARRAY)
+              )
+            addStatement("instance.%L(%L%L)", method.name, if (isVararg) "*" else "", name)
+          }
         }
         addFunction(methodFun)
       }

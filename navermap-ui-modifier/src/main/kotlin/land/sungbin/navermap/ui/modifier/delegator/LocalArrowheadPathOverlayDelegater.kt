@@ -23,5 +23,5 @@ import land.sungbin.navermap.ui.modifier.arrowheadpathoverlay.RealArrowheadPathO
 
 public val LocalArrowheadPathOverlayDelegater:
   ProvidableCompositionLocal<ArrowheadPathOverlayDelegate> = staticCompositionLocalOf {
-    RealArrowheadPathOverlayDelegate
-  }
+  RealArrowheadPathOverlayDelegate
+}

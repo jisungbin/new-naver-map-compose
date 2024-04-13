@@ -17,13 +17,9 @@
 package land.sungbin.navermap.ui.modifier.locationoverlay
 
 import androidx.compose.runtime.Stable
-import java.lang.System.identityHashCode
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.locationoverlay.LocationOverlayDelegate.Companion.NoOp
+import java.lang.System.identityHashCode
 
 public interface LocationOverlayModifier {
   public var delegator: LocationOverlayDelegate
@@ -33,7 +29,7 @@ public interface LocationOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, LocationOverlayModifier) -> R): R
 
   public infix fun then(other: LocationOverlayModifier): LocationOverlayModifier = if
-    (other === LocationOverlayModifier) this else CombinedLocationOverlayModifier(this, other)
+                                                                                     (other === LocationOverlayModifier) this else CombinedLocationOverlayModifier(this, other)
 
   public companion object : LocationOverlayModifier {
     override var delegator: LocationOverlayDelegate = NoOp

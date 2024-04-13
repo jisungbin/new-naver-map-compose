@@ -16,6 +16,7 @@
 
 package land.sungbin.navermap.ui.modifier.generator
 
+import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.PropertySpec
@@ -36,3 +37,16 @@ internal fun TypeSpec.Builder.addProperties(vararg properties: PropertySpec) =
 
 internal fun FileSpec.Builder.addTypes(vararg types: TypeSpec) =
   addTypes(types.asList())
+
+internal fun suppress(vararg warning: String) =
+  AnnotationSpec.builder(Suppress::class)
+    .addMember(warning.joinToString { "\"$it\"" })
+    .build()
+
+internal fun deprecated(
+  message: String = "Deprecated from the original API.",
+  replaceWith: String = "",
+) = AnnotationSpec.builder(Deprecated::class)
+  .addMember("%S", message)
+  .addMember("%T(%S)", ReplaceWith::class, replaceWith)
+  .build()

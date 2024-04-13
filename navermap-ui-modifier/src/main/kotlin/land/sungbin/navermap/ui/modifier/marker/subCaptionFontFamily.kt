@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
+@file:Suppress("RedundantVisibilityModifier")
+
 package land.sungbin.navermap.ui.modifier.marker
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import kotlin.Any
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -28,7 +29,7 @@ import land.sungbin.navermap.ui.modifier.marker.MarkerDelegate.Companion.NoOp
 
 @Immutable
 private data class MarkerSubCaptionFontFamilyModifierNode(
-  private val arg0: List<String>,
+  private val arg0: Array<String>,
   override var delegator: MarkerDelegate = NoOp,
 ) : MarkerModifier {
   override fun getContributionNode(): MapModifierContributionNode =
@@ -40,7 +41,7 @@ private data class MarkerSubCaptionFontFamilyModifierNode(
 
 @Stable
 private data class MarkerSubCaptionFontFamilyContributionNode(
-  public val arg0: List<String>,
+  public val arg0: Array<String>,
   public val `delegate`: MarkerDelegate = NoOp,
 ) : MapModifierContributionNode {
   override val kindSet: ContributionKind = Overlay
@@ -55,14 +56,14 @@ private data class MarkerSubCaptionFontFamilyContributionNode(
 }
 
 private class MarkerSubCaptionFontFamilyContributor(
-  public var arg0: List<String>,
+  public var arg0: Array<String>,
   public var `delegate`: MarkerDelegate,
 ) : OverlayContributor {
   override fun Any.contribute() {
-    delegate.setSubCaptionFontFamily(this, *arg0.toTypedArray())
+    delegate.setSubCaptionFontFamily(this, arg0)
   }
 }
 
 @Stable
-public fun MarkerModifier.subCaptionFontFamily(arg0: List<String>): MarkerModifier =
+public fun MarkerModifier.subCaptionFontFamily(arg0: Array<String>): MarkerModifier =
   this then MarkerSubCaptionFontFamilyModifierNode(arg0)

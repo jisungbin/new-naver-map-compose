@@ -14,72 +14,70 @@
  * limitations under the License.
  */
 
+@file:Suppress("UsePropertyAccessSyntax")
+
 package land.sungbin.navermap.ui.modifier.circleoverlay
 
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.overlay.CircleOverlay
 import com.naver.maps.map.overlay.Overlay
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Double
-import kotlin.Int
 
 public interface CircleOverlayDelegate {
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/CircleOverlay.html#setMap(com.naver.maps.map.NaverMap))
    */
-  public fun setMap(instance: Any, arg0: NaverMap?) {
+  public fun setMap(instance: Any, arg0: Any?) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/CircleOverlay.html#setGlobalZIndex(int))
    */
-  public fun setGlobalZIndex(instance: Any, arg0: Int) {
+  public fun setGlobalZIndex(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/CircleOverlay.html#setCenter(com.naver.maps.geometry.LatLng))
    */
-  public fun setCenter(instance: Any, arg0: LatLng) {
+  public fun setCenter(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/CircleOverlay.html#setRadius(double))
    */
-  public fun setRadius(instance: Any, arg0: Double) {
+  public fun setRadius(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/CircleOverlay.html#setColor(int))
    */
-  public fun setColor(instance: Any, arg0: Int) {
+  public fun setColor(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/CircleOverlay.html#setOutlineWidth(int))
    */
-  public fun setOutlineWidth(instance: Any, arg0: Int) {
+  public fun setOutlineWidth(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/CircleOverlay.html#setOutlineColor(int))
    */
-  public fun setOutlineColor(instance: Any, arg0: Int) {
+  public fun setOutlineColor(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setOnClickListener(com.naver.maps.map.overlay.Overlay.OnClickListener))
    */
-  public fun setOnClickListener(instance: Any, arg0: Overlay.OnClickListener?) {
+  public fun setOnClickListener(instance: Any, arg0: Any?) {
   }
 
   /**
@@ -93,42 +91,42 @@ public interface CircleOverlayDelegate {
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setVisible(boolean))
    */
-  public fun setVisible(instance: Any, arg0: Boolean) {
+  public fun setVisible(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMinZoom(double))
    */
-  public fun setMinZoom(instance: Any, arg0: Double) {
+  public fun setMinZoom(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMaxZoom(double))
    */
-  public fun setMaxZoom(instance: Any, arg0: Double) {
+  public fun setMaxZoom(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMinZoomInclusive(boolean))
    */
-  public fun setMinZoomInclusive(instance: Any, arg0: Boolean) {
+  public fun setMinZoomInclusive(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setMaxZoomInclusive(boolean))
    */
-  public fun setMaxZoomInclusive(instance: Any, arg0: Boolean) {
+  public fun setMaxZoomInclusive(instance: Any, arg0: Any) {
   }
 
   /**
    * See
    * [official document](https://navermaps.github.io/android-map-sdk/reference/com/naver/maps/map/overlay/Overlay.html#setZIndex(int))
    */
-  public fun setZIndex(instance: Any, arg0: Int) {
+  public fun setZIndex(instance: Any, arg0: Any) {
   }
 
   public companion object {
@@ -137,43 +135,51 @@ public interface CircleOverlayDelegate {
 }
 
 public object RealCircleOverlayDelegate : CircleOverlayDelegate {
-  override fun setMap(instance: Any, arg0: NaverMap?) {
+  override fun setMap(instance: Any, arg0: Any?) {
     require(instance is CircleOverlay)
+    require(arg0 is NaverMap?)
     instance.setMap(arg0)
   }
 
-  override fun setGlobalZIndex(instance: Any, arg0: Int) {
+  override fun setGlobalZIndex(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Int)
     instance.setGlobalZIndex(arg0)
   }
 
-  override fun setCenter(instance: Any, arg0: LatLng) {
+  override fun setCenter(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is LatLng)
     instance.setCenter(arg0)
   }
 
-  override fun setRadius(instance: Any, arg0: Double) {
+  override fun setRadius(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Double)
     instance.setRadius(arg0)
   }
 
-  override fun setColor(instance: Any, arg0: Int) {
+  override fun setColor(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Int)
     instance.setColor(arg0)
   }
 
-  override fun setOutlineWidth(instance: Any, arg0: Int) {
+  override fun setOutlineWidth(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Int)
     instance.setOutlineWidth(arg0)
   }
 
-  override fun setOutlineColor(instance: Any, arg0: Int) {
+  override fun setOutlineColor(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Int)
     instance.setOutlineColor(arg0)
   }
 
-  override fun setOnClickListener(instance: Any, arg0: Overlay.OnClickListener?) {
+  override fun setOnClickListener(instance: Any, arg0: Any?) {
     require(instance is CircleOverlay)
+    require(arg0 is Overlay.OnClickListener?)
     instance.setOnClickListener(arg0)
   }
 
@@ -182,33 +188,39 @@ public object RealCircleOverlayDelegate : CircleOverlayDelegate {
     instance.setTag(arg0)
   }
 
-  override fun setVisible(instance: Any, arg0: Boolean) {
+  override fun setVisible(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Boolean)
     instance.setVisible(arg0)
   }
 
-  override fun setMinZoom(instance: Any, arg0: Double) {
+  override fun setMinZoom(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Double)
     instance.setMinZoom(arg0)
   }
 
-  override fun setMaxZoom(instance: Any, arg0: Double) {
+  override fun setMaxZoom(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Double)
     instance.setMaxZoom(arg0)
   }
 
-  override fun setMinZoomInclusive(instance: Any, arg0: Boolean) {
+  override fun setMinZoomInclusive(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Boolean)
     instance.setMinZoomInclusive(arg0)
   }
 
-  override fun setMaxZoomInclusive(instance: Any, arg0: Boolean) {
+  override fun setMaxZoomInclusive(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Boolean)
     instance.setMaxZoomInclusive(arg0)
   }
 
-  override fun setZIndex(instance: Any, arg0: Int) {
+  override fun setZIndex(instance: Any, arg0: Any) {
     require(instance is CircleOverlay)
+    require(arg0 is Int)
     instance.setZIndex(arg0)
   }
 }

@@ -17,13 +17,9 @@
 package land.sungbin.navermap.ui.modifier.marker
 
 import androidx.compose.runtime.Stable
-import java.lang.System.identityHashCode
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.marker.MarkerDelegate.Companion.NoOp
+import java.lang.System.identityHashCode
 
 public interface MarkerModifier {
   public var delegator: MarkerDelegate

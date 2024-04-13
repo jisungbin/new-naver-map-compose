@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(DelicateKotlinPoetApi::class)
+
 package land.sungbin.navermap.ui.modifier.generator.parser
 
 import com.google.gson.GsonBuilder
@@ -22,23 +24,29 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import com.naver.maps.map.overlay.Overlay
-import com.squareup.kotlinpoet.ANY
+import com.squareup.kotlinpoet.ARRAY
 import com.squareup.kotlinpoet.BOOLEAN
 import com.squareup.kotlinpoet.BYTE
+import com.squareup.kotlinpoet.BYTE_ARRAY
 import com.squareup.kotlinpoet.CHAR
+import com.squareup.kotlinpoet.CHAR_ARRAY
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.DOUBLE
+import com.squareup.kotlinpoet.DOUBLE_ARRAY
+import com.squareup.kotlinpoet.DelicateKotlinPoetApi
 import com.squareup.kotlinpoet.FLOAT
+import com.squareup.kotlinpoet.FLOAT_ARRAY
 import com.squareup.kotlinpoet.INT
-import com.squareup.kotlinpoet.LIST
+import com.squareup.kotlinpoet.INT_ARRAY
 import com.squareup.kotlinpoet.LONG
+import com.squareup.kotlinpoet.LONG_ARRAY
 import com.squareup.kotlinpoet.ParameterizedTypeName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.SHORT
-import com.squareup.kotlinpoet.STRING
+import com.squareup.kotlinpoet.SHORT_ARRAY
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.UNIT
-import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.asClassName
 import io.github.classgraph.ArrayTypeSignature
 import io.github.classgraph.BaseTypeSignature
 import io.github.classgraph.ClassGraph
@@ -102,6 +110,7 @@ data class OverlayClass(
   data class Method(
     val name: String,
     val parameters: List<Pair<String, TypeName>>,
+    val deprecated: Boolean,
     val javadocLink: String,
   )
 }
@@ -121,6 +130,7 @@ fun findOverlayBaseMethods(): List<OverlayClass.Method> {
       OverlayClass.Method(
         name = method.name,
         parameters = method.parameters().toList(),
+        deprecated = method.hasAnnotation(java.lang.Deprecated::class.java),
         javadocLink = method.javadocLink(),
       )
     }
@@ -148,6 +158,7 @@ fun findAllOverlayClasses(): List<OverlayClass> {
         OverlayClass.Method(
           name = method.name,
           parameters = method.parameters().toList(),
+          deprecated = method.hasAnnotation(java.lang.Deprecated::class.java),
           javadocLink = method.javadocLink(),
         )
       },
@@ -159,7 +170,7 @@ fun findAllOverlayClasses(): List<OverlayClass> {
 }
 
 private fun MethodInfo.isSetter(): Boolean =
-  name.startsWith("set") && (typeDescriptor.resultType as? BaseTypeSignature)?.type === Void.TYPE
+  name.startsWith("set") && (typeSignatureOrTypeDescriptor.resultType as? BaseTypeSignature)?.type === Void.TYPE
 
 private fun MethodInfo.parameters(): Map<String, TypeName> {
   // TODO: https://discuss.gradle.org/t/how-to-pass-parameters-option-to-javac-compiler-when-building-my-java-project-with-gradle/2106
@@ -168,7 +179,7 @@ private fun MethodInfo.parameters(): Map<String, TypeName> {
   var argIndex = 0
   return parameterInfo.associate { param ->
     val nullable = param.hasAnnotation(NULLABLE)
-    "arg${argIndex++}" to param.typeDescriptor.typed().copy(nullable = nullable)
+    "arg${argIndex++}" to param.typeSignatureOrTypeDescriptor.typedKotlin().copy(nullable = nullable)
   }
 }
 
@@ -187,63 +198,56 @@ private fun MethodInfo.javadocLink() = buildString {
   )
 }
 
-private fun ClassName.useKoltinCollections() = if (this.canonicalName == "java.util.List") LIST else this
-
 private fun TypeSignature.fqn(varargVisualizing: Boolean = false) = when (this) {
-  is ArrayTypeSignature -> arrayClassInfo.name.let {
-    if (it.endsWith("[]")) it.removeSuffix("[]") + (if (varargVisualizing) "..." else "")
-    else it
-  }
+  is ArrayTypeSignature -> arrayClassInfo.name.removeSuffix("[]") + if (varargVisualizing) "..." else ""
   is ClassRefTypeSignature -> fullyQualifiedClassName.replace('$', '.')
   is BaseTypeSignature -> typeStr
   else -> error("Unknown type: $this")
 }
 
-private fun String.typed(): ClassName =
-  when {
-    this == Void.TYPE.canonicalName -> UNIT
-    this == Boolean::class.javaPrimitiveType!!.canonicalName -> BOOLEAN
-    this == Byte::class.javaPrimitiveType!!.canonicalName -> BYTE
-    this == Short::class.javaPrimitiveType!!.canonicalName -> SHORT
-    this == Int::class.javaPrimitiveType!!.canonicalName -> INT
-    this == Long::class.javaPrimitiveType!!.canonicalName -> LONG
-    this == Char::class.javaPrimitiveType!!.canonicalName -> CHAR
-    this == Float::class.javaPrimitiveType!!.canonicalName -> FLOAT
-    this == Double::class.javaPrimitiveType!!.canonicalName -> DOUBLE
-    else -> ClassName.bestGuess(this)
-  }
+private fun TypeSignature.typedKotlin() = when (this) {
+  is BaseTypeSignature -> typedKotlin()
+  is ArrayTypeSignature -> typedKotlin()
+  is ClassRefTypeSignature -> foldInnerKotlinTypes()
+  else -> error("Unsupported type: $this")
+}
 
-private fun TypeSignature.typed(): TypeName = when (this) {
-  is ArrayTypeSignature -> recursiveTyped().also {
+private fun ArrayTypeSignature.typedKotlin() =
+  when (val componentType = loadElementClass()) {
+    Byte::class.javaPrimitiveType!! -> BYTE_ARRAY
+    Char::class.javaPrimitiveType!! -> CHAR_ARRAY
+    Short::class.javaPrimitiveType!! -> SHORT_ARRAY
+    Int::class.javaPrimitiveType!! -> INT_ARRAY
+    Long::class.javaPrimitiveType!! -> LONG_ARRAY
+    Float::class.javaPrimitiveType!! -> FLOAT_ARRAY
+    Double::class.javaPrimitiveType!! -> DOUBLE_ARRAY
+    else -> ARRAY.parameterizedBy(componentType.asClassName().kotlinType())
+  }.also {
     logger.warning(
-      "An ArrayTypeSignature was found! You probably need to manually fix the type. " +
-        "[${toStringWithSimpleNames()}]",
+      "[$it] ARRAY type detected. Please manually update the equals/hashCode " +
+        "of the data class.",
     )
   }
-  is ClassRefTypeSignature -> (loadClass().asTypeName() as ClassName).useKotlinPrimitiveType()
-  is BaseTypeSignature -> type.asTypeName()
-  else -> error("Unknown type: $this")
-}
 
-// @Experimental
-private fun ArrayTypeSignature.recursiveTyped(): TypeName {
-  var current: TypeSignature = this
-  val types = mutableListOf<ClassName>()
-  while (current is ArrayTypeSignature) {
-    types += current.arrayClassInfo.name.removeSuffix("[]").typed().useKoltinCollections()
-    current = current.nestedType
+private fun BaseTypeSignature.typedKotlin() =
+  when (val type = type) {
+    Void.TYPE -> UNIT
+    Boolean::class.javaPrimitiveType -> BOOLEAN
+    Byte::class.javaPrimitiveType -> BYTE
+    Short::class.javaPrimitiveType -> SHORT
+    Int::class.javaPrimitiveType -> INT
+    Long::class.javaPrimitiveType -> LONG
+    Char::class.javaPrimitiveType -> CHAR
+    Float::class.javaPrimitiveType -> FLOAT
+    Double::class.javaPrimitiveType -> DOUBLE
+    else -> error("Unsupported primitive type: $type")
   }
-  types += current.typed() as ClassName
-  return if (types.size > 1) types.dropLast(1).foldRight(types.last() as TypeName) { type, acc ->
-    type.parameterizedBy(acc)
-  } else types.first()
-}
 
-// Only java.util.List, java.lang.String, java.lang.String.
-// We should also handle the java.util.List of ParameterizedTypeName, but due to its complexity, we do it manually.
-private fun ClassName.useKotlinPrimitiveType(): ClassName =
-  when (canonicalName) {
-    "java.lang.String" -> STRING
-    "java.lang.Object" -> ANY
-    else -> this
+private fun ClassRefTypeSignature.foldInnerKotlinTypes(): TypeName {
+  val parent = loadClass().asClassName().kotlinType()
+  if (typeArguments.isNotEmpty()) {
+    val trailing = typeArguments.map { argu -> (argu.typeSignature as ClassRefTypeSignature).foldInnerKotlinTypes() }
+    return parent.parameterizedBy(trailing)
   }
+  return parent
+}

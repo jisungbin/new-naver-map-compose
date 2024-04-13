@@ -105,6 +105,7 @@ internal fun ktModifierExtension(method: OverlayClass.Method, context: Generator
 
   return ktFun(context.normalizeName(method.name, NameFlag.MODIFIER_EXTENSION)) {
     addAnnotation(STABLE)
+    if (method.deprecated) addAnnotation(deprecated())
     receiver(modifierClazz)
     method.parameters.forEach { (name, type) -> addParameter(name, type) }
     returns(modifierClazz)

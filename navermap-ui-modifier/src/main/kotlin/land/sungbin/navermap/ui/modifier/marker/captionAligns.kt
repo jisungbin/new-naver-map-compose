@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+@file:Suppress("RedundantVisibilityModifier")
+
 package land.sungbin.navermap.ui.modifier.marker
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.map.overlay.Align
-import kotlin.Any
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -29,7 +30,7 @@ import land.sungbin.navermap.ui.modifier.marker.MarkerDelegate.Companion.NoOp
 
 @Immutable
 private data class MarkerCaptionAlignsModifierNode(
-  private val arg0: List<Align>,
+  private val arg0: Array<Align>,
   override var delegator: MarkerDelegate = NoOp,
 ) : MarkerModifier {
   override fun getContributionNode(): MapModifierContributionNode =
@@ -41,7 +42,7 @@ private data class MarkerCaptionAlignsModifierNode(
 
 @Stable
 private data class MarkerCaptionAlignsContributionNode(
-  public val arg0: List<Align>,
+  public val arg0: Array<Align>,
   public val `delegate`: MarkerDelegate = NoOp,
 ) : MapModifierContributionNode {
   override val kindSet: ContributionKind = Overlay
@@ -56,14 +57,14 @@ private data class MarkerCaptionAlignsContributionNode(
 }
 
 private class MarkerCaptionAlignsContributor(
-  public var arg0: List<Align>,
+  public var arg0: Array<Align>,
   public var `delegate`: MarkerDelegate,
 ) : OverlayContributor {
   override fun Any.contribute() {
-    delegate.setCaptionAligns(this, *arg0.toTypedArray())
+    delegate.setCaptionAligns(this, arg0)
   }
 }
 
 @Stable
-public fun MarkerModifier.captionAligns(arg0: List<Align>): MarkerModifier =
+public fun MarkerModifier.captionAligns(arg0: Array<Align>): MarkerModifier =
   this then MarkerCaptionAlignsModifierNode(arg0)

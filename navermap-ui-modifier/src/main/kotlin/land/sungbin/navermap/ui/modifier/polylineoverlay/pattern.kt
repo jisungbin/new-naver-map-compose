@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+@file:Suppress("RedundantVisibilityModifier")
+
 package land.sungbin.navermap.ui.modifier.polylineoverlay
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import kotlin.Any
-import kotlin.Int
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -37,22 +37,6 @@ private data class PolylineOverlayPatternModifierNode(
 
   override fun <R : Any> fold(initial: R, operation: (R, PolylineOverlayModifier) -> R): R =
     operation(initial, this)
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is PolylineOverlayPatternModifierNode) return false
-
-    if (!arg0.contentEquals(other.arg0)) return false
-    if (delegator != other.delegator) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    var result = arg0.contentHashCode()
-    result = 31 * result + delegator.hashCode()
-    return result
-  }
 }
 
 @Stable
@@ -68,22 +52,6 @@ private data class PolylineOverlayPatternContributionNode(
     require(contributor is PolylineOverlayPatternContributor)
     contributor.arg0 = arg0
     contributor.delegate = delegate
-  }
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (other !is PolylineOverlayPatternContributionNode) return false
-
-    if (!arg0.contentEquals(other.arg0)) return false
-    if (`delegate` != other.`delegate`) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    var result = arg0.contentHashCode()
-    result = 31 * result + `delegate`.hashCode()
-    return result
   }
 }
 

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+@file:Suppress("RedundantVisibilityModifier")
+
 package land.sungbin.navermap.ui.modifier.multipartpathoverlay
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.naver.maps.geometry.LatLng
-import kotlin.Any
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -65,5 +66,4 @@ private class MultipartPathOverlayCoordPartsContributor(
 }
 
 @Stable
-public fun MultipartPathOverlayModifier.coordParts(arg0: List<List<LatLng>>): MultipartPathOverlayModifier =
-  this then MultipartPathOverlayCoordPartsModifierNode(arg0)
+public fun MultipartPathOverlayModifier.coordParts(arg0: List<List<LatLng>>): MultipartPathOverlayModifier = this then MultipartPathOverlayCoordPartsModifierNode(arg0)

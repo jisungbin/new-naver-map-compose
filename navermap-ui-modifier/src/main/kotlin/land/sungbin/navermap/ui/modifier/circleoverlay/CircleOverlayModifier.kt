@@ -17,13 +17,9 @@
 package land.sungbin.navermap.ui.modifier.circleoverlay
 
 import androidx.compose.runtime.Stable
-import java.lang.System.identityHashCode
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.circleoverlay.CircleOverlayDelegate.Companion.NoOp
+import java.lang.System.identityHashCode
 
 public interface CircleOverlayModifier {
   public var delegator: CircleOverlayDelegate
@@ -33,7 +29,7 @@ public interface CircleOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, CircleOverlayModifier) -> R): R
 
   public infix fun then(other: CircleOverlayModifier): CircleOverlayModifier = if
-    (other === CircleOverlayModifier) this else CombinedCircleOverlayModifier(this, other)
+                                                                                 (other === CircleOverlayModifier) this else CombinedCircleOverlayModifier(this, other)
 
   public companion object : CircleOverlayModifier {
     override var delegator: CircleOverlayDelegate = NoOp

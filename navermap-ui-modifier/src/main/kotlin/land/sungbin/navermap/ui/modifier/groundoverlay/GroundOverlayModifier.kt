@@ -17,13 +17,9 @@
 package land.sungbin.navermap.ui.modifier.groundoverlay
 
 import androidx.compose.runtime.Stable
-import java.lang.System.identityHashCode
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.groundoverlay.GroundOverlayDelegate.Companion.NoOp
+import java.lang.System.identityHashCode
 
 public interface GroundOverlayModifier {
   public var delegator: GroundOverlayDelegate
@@ -33,7 +29,7 @@ public interface GroundOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, GroundOverlayModifier) -> R): R
 
   public infix fun then(other: GroundOverlayModifier): GroundOverlayModifier = if
-    (other === GroundOverlayModifier) this else CombinedGroundOverlayModifier(this, other)
+                                                                                 (other === GroundOverlayModifier) this else CombinedGroundOverlayModifier(this, other)
 
   public companion object : GroundOverlayModifier {
     override var delegator: GroundOverlayDelegate = NoOp

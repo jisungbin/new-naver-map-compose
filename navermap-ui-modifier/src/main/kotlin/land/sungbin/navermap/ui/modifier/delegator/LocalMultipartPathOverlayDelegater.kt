@@ -23,5 +23,5 @@ import land.sungbin.navermap.ui.modifier.multipartpathoverlay.RealMultipartPathO
 
 public val LocalMultipartPathOverlayDelegater:
   ProvidableCompositionLocal<MultipartPathOverlayDelegate> = staticCompositionLocalOf {
-    RealMultipartPathOverlayDelegate
-  }
+  RealMultipartPathOverlayDelegate
+}

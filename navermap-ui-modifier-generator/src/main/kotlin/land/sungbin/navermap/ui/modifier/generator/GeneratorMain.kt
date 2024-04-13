@@ -34,8 +34,11 @@ fun main() = findAllOverlayClasses().forEach { overlayClass ->
   val context = GeneratorContext(pkg, overlayClass)
 
   val delegate = ktDelegate(context)
-  val realDeleage = ktRealDelegate(context)
-  val delegateFile = FileSpec.builder(pkg, delegate.name!!).addTypes(delegate, realDeleage).build()
+  val realDelegate = ktRealDelegate(context)
+  val delegateFile = FileSpec.builder(pkg, delegate.name!!)
+    .addTypes(delegate, realDelegate)
+    .addAnnotation(suppress("UsePropertyAccessSyntax"))
+    .build()
 
   val modifier = ktModifier(context)
   val combinedModifier = ktCombinedModifier(context)
@@ -55,6 +58,7 @@ fun main() = findAllOverlayClasses().forEach { overlayClass ->
     FileSpec.builder(pkg, modifierExtension.name)
       .addTypes(modifierNode, contributuionNode, contributor)
       .addFunction(modifierExtension)
+      .addAnnotation(suppress("RedundantVisibilityModifier"))
       .build()
   }
 

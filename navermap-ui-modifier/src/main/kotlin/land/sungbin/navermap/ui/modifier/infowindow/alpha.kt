@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+@file:Suppress("RedundantVisibilityModifier")
+
 package land.sungbin.navermap.ui.modifier.infowindow
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import kotlin.Any
-import kotlin.Float
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay

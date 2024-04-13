@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+@file:Suppress("RedundantVisibilityModifier")
+
 package land.sungbin.navermap.ui.modifier.multipartpathoverlay
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import com.naver.maps.map.overlay.MultipartPathOverlay.ColorPart
-import kotlin.Any
+import com.naver.maps.map.overlay.MultipartPathOverlay
 import land.sungbin.navermap.runtime.contributor.ContributionKind
 import land.sungbin.navermap.runtime.contributor.Contributor
 import land.sungbin.navermap.runtime.contributor.Contributors.Overlay
@@ -29,7 +30,7 @@ import land.sungbin.navermap.ui.modifier.multipartpathoverlay.MultipartPathOverl
 
 @Immutable
 private data class MultipartPathOverlayColorPartsModifierNode(
-  private val arg0: List<ColorPart>,
+  private val arg0: List<MultipartPathOverlay.ColorPart>,
   override var delegator: MultipartPathOverlayDelegate = NoOp,
 ) : MultipartPathOverlayModifier {
   override fun getContributionNode(): MapModifierContributionNode =
@@ -41,7 +42,7 @@ private data class MultipartPathOverlayColorPartsModifierNode(
 
 @Stable
 private data class MultipartPathOverlayColorPartsContributionNode(
-  public val arg0: List<ColorPart>,
+  public val arg0: List<MultipartPathOverlay.ColorPart>,
   public val `delegate`: MultipartPathOverlayDelegate = NoOp,
 ) : MapModifierContributionNode {
   override val kindSet: ContributionKind = Overlay
@@ -56,7 +57,7 @@ private data class MultipartPathOverlayColorPartsContributionNode(
 }
 
 private class MultipartPathOverlayColorPartsContributor(
-  public var arg0: List<ColorPart>,
+  public var arg0: List<MultipartPathOverlay.ColorPart>,
   public var `delegate`: MultipartPathOverlayDelegate,
 ) : OverlayContributor {
   override fun Any.contribute() {
@@ -65,5 +66,4 @@ private class MultipartPathOverlayColorPartsContributor(
 }
 
 @Stable
-public fun MultipartPathOverlayModifier.colorParts(arg0: List<ColorPart>): MultipartPathOverlayModifier =
-  this then MultipartPathOverlayColorPartsModifierNode(arg0)
+public fun MultipartPathOverlayModifier.colorParts(arg0: List<MultipartPathOverlay.ColorPart>): MultipartPathOverlayModifier = this then MultipartPathOverlayColorPartsModifierNode(arg0)

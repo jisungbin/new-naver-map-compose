@@ -17,13 +17,9 @@
 package land.sungbin.navermap.ui.modifier.polylineoverlay
 
 import androidx.compose.runtime.Stable
-import java.lang.System.identityHashCode
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Int
-import kotlin.String
 import land.sungbin.navermap.runtime.modifier.MapModifierContributionNode
 import land.sungbin.navermap.ui.modifier.polylineoverlay.PolylineOverlayDelegate.Companion.NoOp
+import java.lang.System.identityHashCode
 
 public interface PolylineOverlayModifier {
   public var delegator: PolylineOverlayDelegate
@@ -33,7 +29,7 @@ public interface PolylineOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, PolylineOverlayModifier) -> R): R
 
   public infix fun then(other: PolylineOverlayModifier): PolylineOverlayModifier = if
-    (other === PolylineOverlayModifier) this else CombinedPolylineOverlayModifier(this, other)
+                                                                                     (other === PolylineOverlayModifier) this else CombinedPolylineOverlayModifier(this, other)
 
   public companion object : PolylineOverlayModifier {
     override var delegator: PolylineOverlayDelegate = NoOp
