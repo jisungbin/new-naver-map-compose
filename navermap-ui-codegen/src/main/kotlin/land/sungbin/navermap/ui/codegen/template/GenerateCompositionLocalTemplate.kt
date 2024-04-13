@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package land.sungbin.navermap.ui.modifier.delegator
+package land.sungbin.navermap.ui.codegen.template
 
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
-import land.sungbin.navermap.ui.modifier.multipartpathoverlay.MultipartPathOverlayDelegate
-import land.sungbin.navermap.ui.modifier.multipartpathoverlay.RealMultipartPathOverlayDelegate
 
-public val LocalMultipartPathOverlayDelegater:
-  ProvidableCompositionLocal<MultipartPathOverlayDelegate> = staticCompositionLocalOf {
-    RealMultipartPathOverlayDelegate
-  }
+@Suppress("unused")
+val LocalMarkerDelegater: ProvidableCompositionLocal<MarkerDelegate> =
+  staticCompositionLocalOf { RealMarkerDelegate }

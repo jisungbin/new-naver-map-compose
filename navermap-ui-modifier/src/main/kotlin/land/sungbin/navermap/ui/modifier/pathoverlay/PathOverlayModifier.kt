@@ -29,7 +29,7 @@ public interface PathOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, PathOverlayModifier) -> R): R
 
   public infix fun then(other: PathOverlayModifier): PathOverlayModifier = if
-                                                                             (other === PathOverlayModifier) this else CombinedPathOverlayModifier(this, other)
+    (other === PathOverlayModifier) this else CombinedPathOverlayModifier(this, other)
 
   public companion object : PathOverlayModifier {
     override var delegator: PathOverlayDelegate = NoOp

@@ -33,7 +33,7 @@ public interface ViewportOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, ViewportOverlayModifier) -> R): R
 
   public infix fun then(other: ViewportOverlayModifier): ViewportOverlayModifier = if
-                                                                                     (other === ViewportOverlayModifier) this else CombinedViewportOverlayModifier(this, other)
+    (other === ViewportOverlayModifier) this else CombinedViewportOverlayModifier(this, other)
 
   public companion object : ViewportOverlayModifier {
     override var delegator: ViewportOverlayDelegate = NoOp

@@ -30,6 +30,6 @@ include(
   ":navermap-ui",
   ":navermap-ui-semantics",
   ":navermap-ui-modifier",
-  ":navermap-ui-modifier-generator",
+  ":navermap-ui-codegen",
   ":navermap-test",
 )

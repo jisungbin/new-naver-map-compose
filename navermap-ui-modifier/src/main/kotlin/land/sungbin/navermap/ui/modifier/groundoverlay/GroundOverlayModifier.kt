@@ -29,7 +29,7 @@ public interface GroundOverlayModifier {
   public fun <R : Any> fold(initial: R, operation: (R, GroundOverlayModifier) -> R): R
 
   public infix fun then(other: GroundOverlayModifier): GroundOverlayModifier = if
-                                                                                 (other === GroundOverlayModifier) this else CombinedGroundOverlayModifier(this, other)
+    (other === GroundOverlayModifier) this else CombinedGroundOverlayModifier(this, other)
 
   public companion object : GroundOverlayModifier {
     override var delegator: GroundOverlayDelegate = NoOp
