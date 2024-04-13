@@ -17,8 +17,10 @@
 package land.sungbin.navermap.ui.modifier.generator
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.Stable
 import com.squareup.kotlinpoet.ANY
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.LambdaTypeName
 import com.squareup.kotlinpoet.MemberName.Companion.member
 import com.squareup.kotlinpoet.UNIT
@@ -53,3 +55,6 @@ internal val DELEGATED_OVERLAY = DelegatedOverlay::class.asClassName()
 
 internal val STABLE = Stable::class.asClassName()
 internal val IMMUTABLE = Immutable::class.asClassName()
+
+internal val PROVIDABLE_COMPOSITION_LOCAL = ProvidableCompositionLocal::class.asClassName()
+internal val COMPOSITION_LOCAL_OF = ClassName("androidx.compose.runtime", "staticCompositionLocalOf")

@@ -58,12 +58,19 @@ fun main() = findAllOverlayClasses().forEach { overlayClass ->
       .build()
   }
 
+  val compositionLocal = ktCompositionLocal(context)
+  val compositionLocalFile =
+    FileSpec.builder("$BASE_PACKAGE_NAME.delegator", compositionLocal.name)
+      .addProperty(compositionLocal)
+      .build()
+
   val path = Paths.get(modifierModulePath)
   println("delegate file saved at ${delegateFile.writeTo(path).toString().removePrefix(modifierModulePath)}")
   println("modifier file saved at ${modifierFile.writeTo(path).toString().removePrefix(modifierModulePath)}")
   contributorNodeFiles.forEach { file ->
     println("[${file.name}] modifier file saved at ${file.writeTo(path).toString().removePrefix(modifierModulePath)}")
   }
+  println("composition local file saved at ${compositionLocalFile.writeTo(path).toString().removePrefix(modifierModulePath)}")
   println("\n")
 }
 

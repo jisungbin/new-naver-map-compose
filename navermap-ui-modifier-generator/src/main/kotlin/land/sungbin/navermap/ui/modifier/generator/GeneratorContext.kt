@@ -34,6 +34,7 @@ internal sealed interface NameFlag {
   data object MODIFIER_EXTENSION : NameFlag
   data object CONTRIBUTOR : NameFlag
   data object CONTRIBUTION_NODE : NameFlag
+  data object COMPOSITION_LOCAL : NameFlag, NoName
 }
 
 internal class GeneratorContext(
@@ -66,6 +67,7 @@ internal class GeneratorContext(
       NameFlag.MODIFIER_EXTENSION -> name.normalizeLowercase() // MarkerModifier.[offset]
       NameFlag.CONTRIBUTOR -> "${overlayClass.simpleName}${name.normalizeUppercase()}Contributor" // MarkerLatLngContributor
       NameFlag.CONTRIBUTION_NODE -> "${overlayClass.simpleName}${name.normalizeUppercase()}ContributionNode" // MarkerLatLngContributionNode
+      NameFlag.COMPOSITION_LOCAL -> "Local${overlayClass.simpleName}Delegater" // LocalMarkerDelegater
     }
 
   fun noopDelegator() = buildCodeBlock {
