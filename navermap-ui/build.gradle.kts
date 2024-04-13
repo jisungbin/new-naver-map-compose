@@ -22,7 +22,7 @@ plugins {
 }
 
 android {
-  namespace = "land.sungbin.navermap.compose"
+  namespace = "land.sungbin.navermap.ui"
   compileSdk = 34
 
   defaultConfig {
