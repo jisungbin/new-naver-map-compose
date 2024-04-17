@@ -43,6 +43,7 @@ import land.sungbin.navermap.ui.content.Marker
 import land.sungbin.navermap.ui.modifier.marker.MarkerModifier
 import land.sungbin.navermap.ui.modifier.marker.captionText
 import land.sungbin.navermap.ui.modifier.marker.onClickListener
+import land.sungbin.navermap.ui.modifier.marker.subCaptionText
 import land.sungbin.navermap.ui.modifier.navermap.NaverMapModifier
 import land.sungbin.navermap.ui.modifier.navermap.mapType
 import land.sungbin.navermap.ui.modifier.navermap.nightModeEnabled
@@ -63,11 +64,13 @@ class SampleActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize(0.5f),
           visible = showMap,
         ) {
+          var type by remember { mutableStateOf(MapType.NaviHybrid) }
+
           NaverMap(
             modifier = Modifier.fillMaxSize(),
             naverMapModifier = NaverMapModifier
-              .mapType(MapType.NaviHybrid)
-              .nightModeEnabled(true)
+              .mapType(type)
+              .nightModeEnabled(false)
               .onMapClickListener { _, latlng ->
                 Toast
                   .makeText(this@SampleActivity, "Map Clicked at $latlng", Toast.LENGTH_SHORT)
@@ -87,12 +90,11 @@ class SampleActivity : ComponentActivity() {
               LatLng(37.5670135, 126.9783740),
               modifier = MarkerModifier
                 .onClickListener {
-                  Toast
-                    .makeText(this@SampleActivity, "Marker Clicked at $now", Toast.LENGTH_SHORT)
-                    .show()
+                  type = MapType.entries.random()
                   true
                 }
-                .captionText("Current time is $now"),
+                .captionText("Current time is $now")
+                .subCaptionText("Current map type is ${type.name}"),
             )
           }
         }
