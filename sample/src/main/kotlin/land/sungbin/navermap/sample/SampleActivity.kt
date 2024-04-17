@@ -61,7 +61,7 @@ class SampleActivity : ComponentActivity() {
         var showMap by remember { mutableStateOf(false) }
 
         AnimatedVisibility(
-          modifier = Modifier.fillMaxSize(0.5f),
+          modifier = Modifier.fillMaxSize(0.7f),
           visible = showMap,
         ) {
           var type by remember { mutableStateOf(MapType.NaviHybrid) }
