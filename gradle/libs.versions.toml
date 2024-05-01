@@ -11,7 +11,7 @@ kotlin-coroutines = "1.8.0"
 
 androidx-activity = "1.8.2"
 
-compose-compiler = "1.5.11"
+compose-compiler = "1.5.13"
 compose-runtime = "1.6.5"
 compose-activity = "1.8.2"
 compose-navermap = "3.18.0"
